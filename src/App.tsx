@@ -10,6 +10,7 @@ function App() {
       <Banner />
       <Navbar />
       <MountainTrailsMap/>
+      <footer style={{color: 'white', justifySelf: 'center', padding: 10}}>Udanych wędrówek</footer>
     </div>
   )
 }
