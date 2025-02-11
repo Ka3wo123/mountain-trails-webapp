@@ -11,7 +11,7 @@ export default defineConfig({
     open: true,
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',
+        target: process.env.MOUNTAIN_TRAILS_API_URL ? process.env.MOUNTAIN_TRAILS_API_URL : 'http://localhost:5000',
         changeOrigin: true,
         rewrite: path => path.replace(/^\/api/, '')
       }
