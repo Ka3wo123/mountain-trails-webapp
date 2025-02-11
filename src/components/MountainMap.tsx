@@ -12,9 +12,8 @@ const { Search } = Input;
 const MAX_ZOOM = 13;
 
 const fetchData = async (url: string) => {
-    try {
-        const apiUrl = import.meta.env.MOUNTAIN_TRAILS_API_URL || 'http://localhost:5000'; // Use the Vercel URL or fallback to localhost
-        const response = await fetch(`${apiUrl}${url}`);
+    try {        
+        const response = await fetch(url);
         const result = await response.json();
         return result.data || [];
     } catch (error) {
