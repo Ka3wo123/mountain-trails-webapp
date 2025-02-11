@@ -1,12 +1,12 @@
 export interface Peak {
-    _id: string;  // MongoDB ObjectId stored as a string
+    _id: string;
     type: string;
     id: number;
     lat: number;
     lon: number;
     tags: {
-        [key: string]: string; // Allows flexible tagging
+        [key: string]: string;
         name: string;
-        ele: string; // Elevation
+        ele: string;
     };
 }

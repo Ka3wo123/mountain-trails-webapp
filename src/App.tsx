@@ -1,17 +1,24 @@
-import './App.css'
-import Banner from './components/Banner'
-import MountainTrailsMap from './components/MountainMap'
-import Navbar from './components/Navbar'
+import '@/App.css'
+import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from 'react-router-dom'
+import MountainTrailsMap from '@/components/MountainMap'
+import Header from '@/components/Header'
+import Statistics from '@/components/Statistics'
 
+
+const router = createBrowserRouter(
+  createRoutesFromElements(
+    <Route path='/' element={<Header />}>
+      <Route index element={<MountainTrailsMap />} />
+      <Route path='/stats' element={<Statistics />} />
+    </Route>
+  )
+)
 function App() {
 
   return (
-    <div style={{ height: '100vh' }}>
-      <Banner />
-      <Navbar />
-      <MountainTrailsMap/>
-      <footer style={{color: 'white', justifySelf: 'center', padding: 10}}>Udanych wędrówek</footer>
-    </div>
+    <>
+      <RouterProvider router={router} />      
+    </>
   )
 }
 

@@ -1,5 +1,5 @@
+import "@/styles/banner.css";
 import { useEffect, useState } from "react";
-import "../styles/banner.css";
 import mountainsImage from "../assets/mountains.png";
 
 const Banner = () => {

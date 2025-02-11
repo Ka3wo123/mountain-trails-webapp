@@ -1,22 +1,26 @@
+import 'leaflet/dist/leaflet.css';
 import { useEffect, useState } from 'react';
 import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet';
-import { Peak } from '../models/Peak';
-import { Saddle } from '../models/Saddle';
-import icon from '../assets/mountain-marker.png';
-import 'leaflet/dist/leaflet.css';
+import { Peak } from '@/models/Peak';
+import { Saddle } from '@/models/Saddle';
 import { Icon } from 'leaflet';
-import { Accordion, TextField, Checkbox, FormControlLabel, List, ListItem, ListItemText } from '@mui/material';
+import { Input, Checkbox, Collapse, List, Typography, Card } from 'antd';
+import icon from '@/assets/mountain-marker.png';
+
+const { Panel } = Collapse;
+const { Search } = Input;
 
 const fetchData = async (url: string) => {
     try {
         const response = await fetch(url);
-        const result = await response.json();
-        return result.peaks || result.saddles || [];
+        const result = await response.json();        
+        return result.data || [];
     } catch (error) {
         console.error(`Error fetching data from ${url}:`, error);
         return [];
     }
 };
+
 
 const MapUpdater = ({ setPeaks, setSaddles, showSaddles }: {
     setPeaks: (peaks: Peak[]) => void;
@@ -31,11 +35,11 @@ const MapUpdater = ({ setPeaks, setSaddles, showSaddles }: {
             const boundsParams = `lat1=${bounds.getSouthWest().lat}&lon1=${bounds.getSouthWest().lng}&lat2=${bounds.getNorthEast().lat}&lon2=${bounds.getNorthEast().lng}`;
 
             if (map.getZoom() >= 10) {
-                const newPeaks = await fetchData(`http://localhost:5000/peaks?${boundsParams}`);
+                const newPeaks = await fetchData(`/api/peaks?${boundsParams}`);
                 setPeaks(newPeaks);
 
                 if (showSaddles) {
-                    const newSaddles = await fetchData(`http://localhost:5000/saddles?${boundsParams}`);
+                    const newSaddles = await fetchData(`/api/saddles?${boundsParams}`);
                     setSaddles(newSaddles);
                 }
             } else {
@@ -67,16 +71,32 @@ const MountainTrailsMap = () => {
         iconSize: [38, 38]
     });
 
-    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
+    const handleSearchChange = async (value: string) => {
         setSearchTerm(value);
 
-        if (value) {            
-            const regex = new RegExp(value, 'i');
-            const matchedPeaks = peaks.filter(peak => regex.test(peak.tags.name));
-            setFilteredPeaks(matchedPeaks);
+        if (value) {      
+            const encoded = encodeURIComponent(value);                  
+            const searchPeaks = await fetchData(`/api/peaks?search=${encoded}`);            
+            setFilteredPeaks(searchPeaks);
         } else {
             setFilteredPeaks([]);
+        }
+    };
+
+    const handleSearch = async (value: string) => {
+        setSearchTerm(value);
+    
+        if (value) {
+            const encoded = encodeURIComponent(value);                  
+            const searchPeaks = await fetchData(`/api/peaks?search=${encoded}`);            
+            
+            if (searchPeaks.length > 0) {
+                const peak = searchPeaks[0];
+                const map = (document.querySelector('.leaflet-container') as any)?.__leaflet__;
+                if (map) {
+                    map.setView([peak.lat, peak.lon], map.getZoom());
+                }
+            }
         }
     };
 
@@ -92,8 +112,8 @@ const MountainTrailsMap = () => {
     return (
         <div style={{ display: 'flex', height: '100vh' }}>            
             <div style={{ flex: 1 }}>
-                <MapContainer center={[50.0044, 20.5910]} zoom={13} zoomSnap={0.1} zoomDelta={0.1} style={{ height: '100%', width: 'auto' }}>
-                    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' />
+                <MapContainer center={[50.0044, 20.5910]} zoom={13} zoomSnap={0.5} zoomDelta={0.5} style={{ height: '100%', width: 'auto'}}>
+                    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; OpenStreetMap contributors' />
                     <MapUpdater setPeaks={setPeaks} setSaddles={setSaddles} showSaddles={showSaddles} />
 
                     {peaks.map((peak) => (
@@ -114,33 +134,41 @@ const MountainTrailsMap = () => {
                     ))}
                 </MapContainer>
             </div>
-            
-            <div style={{ width: 'auto', padding: '10px', backgroundColor: '#f4f4f4', overflowY: 'auto' }}>
-                <TextField
-                    label="Szukaj szczytu"
-                    variant="outlined"
-                    size="small"
-                    style={{ marginBottom: '10px', width: '100%' }}
+                        
+            <Card style={{ width: 320, padding: '10px', backgroundColor: '#f9f9f9', boxShadow: '2px 2px 10px rgba(0,0,0,0.1)' }}>
+                <Typography.Title level={5}>Wyszukaj szczyt</Typography.Title>
+                
+                <Search
+                    placeholder="Wpisz nazwę szczytu"
+                    allowClear
+                    onSearch={handleSearch}
+                    onChange={(e) => handleSearchChange(e.target.value)}
                     value={searchTerm}
-                    onChange={handleSearchChange}
+                    style={{ marginBottom: '10px' }}
                 />
-                <Accordion>
-                    <FormControlLabel
-                        control={<Checkbox checked={showSaddles} onChange={(e) => setShowSaddles(e.target.checked)} />}
-                        label="Przełęcze"
-                    />
-                </Accordion>
+
+                <Collapse>
+                    <Panel header="Opcje" key="1">
+                        <Checkbox checked={showSaddles} onChange={(e) => setShowSaddles(e.target.checked)}>
+                            Przełęcze
+                        </Checkbox>
+                    </Panel>
+                </Collapse>
 
                 {filteredPeaks.length > 0 && (
-                    <List style={{ maxHeight: '200px', overflowY: 'auto', backgroundColor: 'white' }}>
-                        {filteredPeaks.map((peak) => (
-                            <ListItem key={peak.id} onClick={() => handleSuggestionClick(peak)}>
-                                <ListItemText primary={peak.tags.name} />
-                            </ListItem>
-                        ))}
-                    </List>
+                    <List
+                        size="small"
+                        bordered
+                        style={{ maxHeight: '200px', overflowY: 'auto', backgroundColor: 'white' }}
+                        dataSource={filteredPeaks}
+                        renderItem={(peak) => (
+                            <List.Item onClick={() => handleSuggestionClick(peak)} style={{ cursor: 'pointer' }}>
+                                {peak.tags.name} ({peak.tags.ele})
+                            </List.Item>
+                        )}
+                    />
                 )}
-            </div>
+            </Card>
         </div>
     );
 };
