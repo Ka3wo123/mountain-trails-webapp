@@ -13,7 +13,8 @@ const MAX_ZOOM = 13;
 
 const fetchData = async (url: string) => {
     try {
-        const response = await fetch(url);
+        const apiUrl = import.meta.env.MOUNTAIN_TRAILS_API_URL || 'http://localhost:5000'; // Use the Vercel URL or fallback to localhost
+        const response = await fetch(`${apiUrl}${url}`);
         const result = await response.json();
         return result.data || [];
     } catch (error) {
@@ -34,8 +35,7 @@ const MapUpdater = ({ setPeaks, setSaddles, showSaddles }: {
         const updateData = async () => {
             const bounds = map.getBounds();
             const boundsParams = `lat1=${bounds.getSouthWest().lat}&lon1=${bounds.getSouthWest().lng}&lat2=${bounds.getNorthEast().lat}&lon2=${bounds.getNorthEast().lng}`;
-            
-            console.log(import.meta.env.MOUNTAIN_TRAILS_API_URL || "niema")
+                        
             if (map.getZoom() >= MAX_ZOOM) {
                 const newPeaks = await fetchData(`/api/peaks?${boundsParams}`);
                 setPeaks(newPeaks);
