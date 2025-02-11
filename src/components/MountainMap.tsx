@@ -35,7 +35,7 @@ const MapUpdater = ({ setPeaks, setSaddles, showSaddles }: {
             const bounds = map.getBounds();
             const boundsParams = `lat1=${bounds.getSouthWest().lat}&lon1=${bounds.getSouthWest().lng}&lat2=${bounds.getNorthEast().lat}&lon2=${bounds.getNorthEast().lng}`;
             
-            console.log(import.meta.env.VITE_MOUNTAIN_TRAILS_API_URL || "niema")
+            console.log(import.meta.env.MOUNTAIN_TRAILS_API_URL || "niema")
             if (map.getZoom() >= MAX_ZOOM) {
                 const newPeaks = await fetchData(`/api/peaks?${boundsParams}`);
                 setPeaks(newPeaks);
