@@ -5,7 +5,6 @@ import { Peak } from '@/models/Peak';
 import { Saddle } from '@/models/Saddle';
 import { Icon } from 'leaflet';
 import { Input, Checkbox, Collapse, List, Typography, Card } from 'antd';
-import api from '@/utils/axios';
 import icon from '@/assets/mountain-marker.png';
 import axios from 'axios';
 
