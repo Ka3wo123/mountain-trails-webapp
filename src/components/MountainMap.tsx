@@ -11,14 +11,14 @@ import axios from 'axios';
 const { Panel } = Collapse;
 const { Search } = Input;
 const MAX_ZOOM = 13;
+const API_BASE_URL = import.meta.env.VITE_PROD_URL || import.meta.env.VITE_DEV_URL;
 
-const fetchData = async (url: string) => {
+const fetchData = async (endpoint: string) => {
     try {        
-        const response = await axios.get(url);
-        const result = await response.data;
-        return result.data || [];
+        const response = await axios.get(`${API_BASE_URL}${endpoint}`);
+        return response.data.data || [];
     } catch (error) {
-        console.error(`Error fetching data from ${url}:`, error);
+        console.error(`Error fetching data from ${endpoint}:`, error);
         return [];
     }
 };
@@ -37,11 +37,11 @@ const MapUpdater = ({ setPeaks, setSaddles, showSaddles }: {
             const boundsParams = `lat1=${bounds.getSouthWest().lat}&lon1=${bounds.getSouthWest().lng}&lat2=${bounds.getNorthEast().lat}&lon2=${bounds.getNorthEast().lng}`;
                         
             if (map.getZoom() >= MAX_ZOOM) {
-                const newPeaks = await fetchData(`https://mountain-trails-api.vercel.app/api/peaks?${boundsParams}`);
+                const newPeaks = await fetchData(`/peaks?${boundsParams}`);
                 setPeaks(newPeaks);
 
                 if (showSaddles) {
-                    const newSaddles = await fetchData(`https://mountain-trails-api.vercel.app/api/saddles?${boundsParams}`);
+                    const newSaddles = await fetchData(`/saddles?${boundsParams}`);
                     setSaddles(newSaddles);
                 }
             } else {
