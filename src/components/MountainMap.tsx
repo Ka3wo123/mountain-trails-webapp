@@ -55,7 +55,7 @@ const MapUpdater = ({ setPeaks, setSaddles, showSaddles }:
 
 const MountainTrailsMap = () => {
     const [peaks, setPeaks] = useState<Peak[]>([]);
-    const [saddles, setSaddles] = useState<Saddle[]>([]);
+    const [_, setSaddles] = useState<Saddle[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [showSaddles, setShowSaddles] = useState(false);
     const [filteredPeaks, setFilteredPeaks] = useState<Peak[]>([]);
