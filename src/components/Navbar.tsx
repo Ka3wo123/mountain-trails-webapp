@@ -1,6 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Link, Outlet } from 'react-router-dom';
-import { Navbar, Nav, Container, Dropdown, Form, Button, Alert } from 'react-bootstrap';
+import { Navbar, Nav, Container, Dropdown, Form, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChartSimple, faMap, faUser, faPersonHiking } from '@fortawesome/free-solid-svg-icons';
 import { useState } from 'react';

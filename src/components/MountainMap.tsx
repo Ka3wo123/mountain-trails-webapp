@@ -60,7 +60,7 @@ const MountainTrailsMap = () => {
     const [showSaddles, setShowSaddles] = useState(false);
     const [filteredPeaks, setFilteredPeaks] = useState<Peak[]>([]);
     const [showMenu, setShowMenu] = useState(false);
-    const { isAuthenticated, logout } = useAuth();
+    const { isAuthenticated } = useAuth();
 
     const peakMarker = new Icon({
         iconUrl: icon,
