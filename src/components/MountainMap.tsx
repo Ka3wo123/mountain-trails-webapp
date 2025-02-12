@@ -5,7 +5,9 @@ import { Peak } from '@/models/Peak';
 import { Saddle } from '@/models/Saddle';
 import { Icon } from 'leaflet';
 import { Input, Checkbox, Collapse, List, Typography, Card } from 'antd';
+import api from '@/utils/axios';
 import icon from '@/assets/mountain-marker.png';
+import axios from 'axios';
 
 const { Panel } = Collapse;
 const { Search } = Input;
@@ -13,8 +15,8 @@ const MAX_ZOOM = 13;
 
 const fetchData = async (url: string) => {
     try {        
-        const response = await fetch(url);
-        const result = await response.json();
+        const response = await axios.get(url);
+        const result = await response.data;
         return result.data || [];
     } catch (error) {
         console.error(`Error fetching data from ${url}:`, error);

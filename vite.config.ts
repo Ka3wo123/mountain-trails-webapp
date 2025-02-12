@@ -11,7 +11,8 @@ export default defineConfig({
     open: true,
     proxy: {
       '/api': {
-        target: process.env.MOUNTAIN_TRAILS_API_URL ? process.env.MOUNTAIN_TRAILS_API_URL : 'http://localhost:5000',
+        // target: process.env.MOUNTAIN_TRAILS_API_URL ? process.env.MOUNTAIN_TRAILS_API_URL : 'http://localhost:5000',
+        target: 'https://mountain-trails-api.vercel.app/',
         changeOrigin: true        
       }
 
