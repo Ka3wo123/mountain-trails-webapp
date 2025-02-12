@@ -9,14 +9,12 @@ export default defineConfig({
   server: {
     port: 3000,
     open: true,
-    proxy: {
-      '/api': {
-        // target: process.env.MOUNTAIN_TRAILS_API_URL ? process.env.MOUNTAIN_TRAILS_API_URL : 'http://localhost:5000',
-        target: 'https://mountain-trails-api.vercel.app/',
-        changeOrigin: true        
-      }
-
-    },
+    // proxy: {
+    //   '/api': {
+    //     target: process.env.MOUNTAIN_TRAILS_API_URL ? process.env.MOUNTAIN_TRAILS_API_URL : 'http://localhost:5000',        
+    //     changeOrigin: true,
+    //   }
+    // },
   },
   resolve: {
     alias: [

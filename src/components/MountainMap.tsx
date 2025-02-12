@@ -37,11 +37,11 @@ const MapUpdater = ({ setPeaks, setSaddles, showSaddles }: {
             const boundsParams = `lat1=${bounds.getSouthWest().lat}&lon1=${bounds.getSouthWest().lng}&lat2=${bounds.getNorthEast().lat}&lon2=${bounds.getNorthEast().lng}`;
                         
             if (map.getZoom() >= MAX_ZOOM) {
-                const newPeaks = await fetchData(`/api/peaks?${boundsParams}`);
+                const newPeaks = await fetchData(`https://mountain-trails-api.vercel.app/api/peaks?${boundsParams}`);
                 setPeaks(newPeaks);
 
                 if (showSaddles) {
-                    const newSaddles = await fetchData(`/api/saddles?${boundsParams}`);
+                    const newSaddles = await fetchData(`https://mountain-trails-api.vercel.app/api/saddles?${boundsParams}`);
                     setSaddles(newSaddles);
                 }
             } else {
@@ -50,7 +50,7 @@ const MapUpdater = ({ setPeaks, setSaddles, showSaddles }: {
             }
         };
 
-        map.on('moveend', updateData);
+        map.on('moveend', updateData);        
         updateData();
 
         return () => {
