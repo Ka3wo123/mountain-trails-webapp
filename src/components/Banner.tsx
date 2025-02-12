@@ -1,6 +1,6 @@
 import "@/styles/banner.css";
 import { useEffect, useState } from "react";
-import mountainsImage from "../assets/mountains.png";
+import mountainsImage from "@/assets/mountains.png";
 
 const Banner = () => {
     const [background, setBackground] = useState("");

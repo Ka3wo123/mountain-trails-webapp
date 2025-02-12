@@ -4,45 +4,37 @@ import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet';
 import { Peak } from '@/models/Peak';
 import { Saddle } from '@/models/Saddle';
 import { Icon } from 'leaflet';
-import { Input, Checkbox, Collapse, List, Typography, Card } from 'antd';
 import icon from '@/assets/mountain-marker.png';
-import axios from 'axios';
+import { Button, Offcanvas, Form, ListGroup } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { get } from '@/utils/httpHelper';
+import { useAuth } from '@/context/authContext';
 
-const { Panel } = Collapse;
-const { Search } = Input;
 const MAX_ZOOM = 13;
-const API_BASE_URL = import.meta.env.VITE_PROD_URL || import.meta.env.VITE_DEV_URL;
 
-const fetchData = async (endpoint: string) => {
-    try {        
-        const response = await axios.get(`${API_BASE_URL}${endpoint}`);
-        return response.data.data || [];
-    } catch (error) {
-        console.error(`Error fetching data from ${endpoint}:`, error);
-        return [];
-    }
-};
+const MapUpdater = ({ setPeaks, setSaddles, showSaddles }:
+    {
+        setPeaks: (peaks: Peak[]) => void;
+        setSaddles: (saddles: Saddle[]) => void;
+        showSaddles: boolean
+    }) => {
 
-
-const MapUpdater = ({ setPeaks, setSaddles, showSaddles }: {
-    setPeaks: (peaks: Peak[]) => void;
-    setSaddles: (saddles: Saddle[]) => void;
-    showSaddles: boolean;
-}) => {
     const map = useMap();
 
     useEffect(() => {
         const updateData = async () => {
             const bounds = map.getBounds();
             const boundsParams = `lat1=${bounds.getSouthWest().lat}&lon1=${bounds.getSouthWest().lng}&lat2=${bounds.getNorthEast().lat}&lon2=${bounds.getNorthEast().lng}`;
-                        
+
             if (map.getZoom() >= MAX_ZOOM) {
-                const newPeaks = await fetchData(`/peaks?${boundsParams}`);
-                setPeaks(newPeaks);
+                const peaksData = await get(`/peaks?${boundsParams}`);
+
+                setPeaks(peaksData.data);
 
                 if (showSaddles) {
-                    const newSaddles = await fetchData(`/saddles?${boundsParams}`);
-                    setSaddles(newSaddles);
+                    const saddlesData = await get(`/saddles?${boundsParams}`);
+                    setSaddles(saddlesData.data);
                 }
             } else {
                 setPeaks([]);
@@ -50,11 +42,11 @@ const MapUpdater = ({ setPeaks, setSaddles, showSaddles }: {
             }
         };
 
-        map.on('moveend', updateData);        
+        map.on('moveend', updateData);
         updateData();
 
         return () => {
-            map.off('moveend', updateData);
+            map.off('moveend', updateData)
         };
     }, [map, setPeaks, setSaddles, showSaddles]);
 
@@ -67,38 +59,23 @@ const MountainTrailsMap = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [showSaddles, setShowSaddles] = useState(false);
     const [filteredPeaks, setFilteredPeaks] = useState<Peak[]>([]);
+    const [showMenu, setShowMenu] = useState(false);
+    const { isAuthenticated, logout } = useAuth();
 
     const peakMarker = new Icon({
         iconUrl: icon,
-        iconSize: [38, 38]
+        iconSize: [30, 30]
     });
 
-    const handleSearchChange = async (value: string) => {
+    const handleSearchChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.value;
         setSearchTerm(value);
 
         if (value) {
-            const encoded = encodeURIComponent(value);
-            const searchPeaks = await fetchData(`/api/peaks?search=${encoded}`);
-            setFilteredPeaks(searchPeaks);
+            const filteredData = await get(`/peaks?search=${encodeURIComponent(value)}`);
+            setFilteredPeaks(filteredData.data);
         } else {
             setFilteredPeaks([]);
-        }
-    };
-
-    const handleSearch = async (value: string) => {
-        setSearchTerm(value);
-
-        if (value) {
-            const encoded = encodeURIComponent(value);
-            const searchPeaks = await fetchData(`/api/peaks?search=${encoded}`);
-
-            if (searchPeaks.length > 0) {
-                const peak = searchPeaks[0];
-                const map = (document.querySelector('.leaflet-container') as any)?.__leaflet__;
-                if (map) {
-                    map.setView([peak.lat, peak.lon], map.getZoom());
-                }
-            }
         }
     };
 
@@ -113,64 +90,87 @@ const MountainTrailsMap = () => {
 
     return (
         <div style={{ display: 'flex', height: '100vh' }}>
-            <div style={{ flex: 1 }}>
-                <MapContainer center={[50.0044, 20.5910]} zoom={13} zoomSnap={0.5} zoomDelta={0.5} style={{ height: '100%', width: 'auto' }}>
-                    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; OpenStreetMap contributors' />
-                    <MapUpdater setPeaks={setPeaks} setSaddles={setSaddles} showSaddles={showSaddles} />
+            <MapContainer center={[50.0044, 20.5910]} zoom={13} style={{ flex: 1 }}>
+                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; OpenStreetMap contributors' />
+                <MapUpdater setPeaks={setPeaks} setSaddles={setSaddles} showSaddles={showSaddles} />
 
-                    {peaks.map((peak) => (
-                        <Marker key={peak.id} position={[peak.lat, peak.lon]} icon={peakMarker}>
-                            <Popup>
-                                <b>{peak.tags.name}</b><br />
-                                Wysokość: {peak.tags.ele} m n.p.m.
-                            </Popup>
-                        </Marker>
-                    ))}
-                    {showSaddles && saddles.map((saddle) => (
-                        <Marker key={saddle.id} position={[saddle.lat, saddle.lon]}>
-                            <Popup>
-                                <b>{saddle.tags.name}</b><br />
-                                Wysokość: {saddle.tags.ele} m n.p.m.
-                            </Popup>
-                        </Marker>
-                    ))}
-                </MapContainer>
-            </div>
+                {peaks.map((peak) => (
+                    <Marker key={peak.id} position={[peak.lat, peak.lon]} icon={peakMarker} >
+                        <Popup>
+                            <b>{peak.tags.name}</b><br />
+                            Wysokość: {peak.tags.ele} m n.p.m.<br />
+                            <small>Koordynaty: {peak.lat.toFixed(5)}, {peak.lon.toFixed(5)}</small>
+                            {isAuthenticated &&
+                                <div className="mt-2">
+                                    <Button>
+                                        Dodaj do zdobytych
+                                    </Button>
+                                </div>}
+                        </Popup>
+                    </Marker>
+                ))}
+            </MapContainer>
 
-            <Card style={{ width: 320, padding: '10px', backgroundColor: '#f9f9f9', boxShadow: '2px 2px 10px rgba(0,0,0,0.1)' }}>
-                <Typography.Title level={5}>Wyszukaj szczyt</Typography.Title>
+            <Button
+                variant="primary"
+                style={{
+                    position: 'relative',
+                    right: 20,
+                    top: 20,
+                    zIndex: 1000,
+                    borderRadius: '50%',
+                    width: '40px',
+                    height: '40px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                }}
+                onClick={() => setShowMenu(true)}
+            >
+                <FontAwesomeIcon icon={faArrowLeft} />
+            </Button>
 
-                <Search
-                    placeholder="Wpisz nazwę szczytu"
-                    allowClear
-                    onSearch={handleSearch}
-                    onChange={(e) => handleSearchChange(e.target.value)}
-                    value={searchTerm}
-                    style={{ marginBottom: '10px' }}
-                />
-
-                <Collapse>
-                    <Panel header="Opcje" key="1">
-                        <Checkbox checked={showSaddles} onChange={(e) => setShowSaddles(e.target.checked)}>
-                            Przełęcze
-                        </Checkbox>
-                    </Panel>
-                </Collapse>
-
-                {filteredPeaks.length > 0 && (
-                    <List
-                        size="small"
-                        bordered
-                        style={{ maxHeight: '200px', overflowY: 'auto', backgroundColor: 'white' }}
-                        dataSource={filteredPeaks}
-                        renderItem={(peak) => (
-                            <List.Item onClick={() => handleSuggestionClick(peak)} style={{ cursor: 'pointer' }}>
-                                {peak.tags.name} ({peak.tags.ele})
-                            </List.Item>
-                        )}
+            <Offcanvas
+                show={showMenu}
+                onHide={() => setShowMenu(false)}
+                placement="end"
+                scroll={true}
+                backdrop={false}
+                style={{
+                    height: '100vh',
+                    width: window.innerWidth > 768 ? '30%' : '100vw',
+                    maxWidth: '400px'
+                }}
+            >
+                <Offcanvas.Header closeButton>
+                    <Offcanvas.Title>Wyszukaj szczyt</Offcanvas.Title>
+                </Offcanvas.Header>
+                <Offcanvas.Body>
+                    <Form.Control
+                        type="text"
+                        placeholder="Wpisz nazwę szczytu"
+                        value={searchTerm}
+                        onChange={handleSearchChange}
+                        className="mb-3"
                     />
-                )}
-            </Card>
+                    {filteredPeaks.length > 0 && (
+                        <ListGroup>
+                            {filteredPeaks.map((peak) => (
+                                <ListGroup.Item key={peak.id} action onClick={() => handleSuggestionClick(peak)}>
+                                    {peak.tags.name} ({peak.tags.ele} m)
+                                </ListGroup.Item>
+                            ))}
+                        </ListGroup>
+                    )}
+                    <Form.Check
+                        type="checkbox"
+                        label="Pokaż przełęcze"
+                        checked={showSaddles}
+                        onChange={(e) => setShowSaddles(e.target.checked)}
+                        className="mt-3"
+                    />
+                </Offcanvas.Body>
+            </Offcanvas>
         </div>
     );
 };
