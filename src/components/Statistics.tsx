@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ProgressBar } from 'react-progressbar-fancy';
 import { User } from '@/models/User';
 import { get } from '@/utils/httpHelper';
 import '@/styles/statistics.css';

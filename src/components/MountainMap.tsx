@@ -11,7 +11,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { get, post } from '@/utils/httpHelper';
 import { useAuth } from '@/context/authContext';
-import { jwtDecode } from 'jwt-decode';
 import toast from 'react-hot-toast';
 import { getNickname } from '@/utils/jwtDecoder';
 
