@@ -11,8 +11,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { get, post } from '@/utils/httpHelper';
 import { useAuth } from '@/context/authContext';
-import toast from 'react-hot-toast';
+import { toast, Toaster } from 'react-hot-toast';
 import { getNickname } from '@/utils/jwtDecoder';
+import warning from '@/assets/warning.png';
 
 const MAX_ZOOM = 13;
 
@@ -104,9 +105,13 @@ const MountainTrailsMap = () => {
 
     const handleAddPeak = async (peakId: string) => {
         try {
-            await post(`/users/${nick}/peaks`, { peakId })
-        } catch (error) {
-            toast.error('Error while adding new peak')
+            await post(`/users/${nick}/peaks`, { peakId });
+            toast.success('Dodano do zdobytych szczytów!');
+        } catch (error: any) {
+            error.status === 400 ?
+                toast('Ten szczyt już jest zdobyty', { icon: warning})
+                :
+                toast.error('Coś poszło nie tak');
         }
 
     }
@@ -204,6 +209,7 @@ const MountainTrailsMap = () => {
                     />
                 </Offcanvas.Body>
             </Offcanvas>
+            <Toaster position='top-right' toastOptions={{ duration: 3000 }} />
         </div>
     );
 };

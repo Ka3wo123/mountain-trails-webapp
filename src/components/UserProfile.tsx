@@ -6,6 +6,7 @@ import { PeakDto } from "@/models/PeakDto";
 import '@/styles/user-profile.css';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faArrowRight, faMountain } from "@fortawesome/free-solid-svg-icons";
+import { RingLoader } from 'react-spinners';
 
 const UserProfile = () => {
     const { nick } = useParams<{ nick: string }>();
@@ -60,6 +61,7 @@ const UserProfile = () => {
 
                 <p><strong>Ilość zdobytych szczytów:</strong> {user?.peaksAchieved.length}</p>
             </div>
+            
             <h3>Lista zdobytych szczytów</h3>
             {peaks.length > 0 ? (
                 <div>
@@ -93,6 +95,7 @@ const UserProfile = () => {
             ) : (
                 <p>No achieved peaks yet.</p>
             )}
+            <RingLoader size={50}/>
         </div>
     );
 }
