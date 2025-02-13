@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Form, Container } from 'react-bootstrap';
+import { Button, Form } from 'react-bootstrap';
 import { post } from '@/utils/httpHelper';
 import { toast, Toaster } from 'react-hot-toast';
 import '@/styles/registration.css';
