@@ -6,7 +6,6 @@ import { PeakDto } from "@/models/PeakDto";
 import '@/styles/user-profile.css';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faArrowRight, faMountain } from "@fortawesome/free-solid-svg-icons";
-import { ScaleLoader } from 'react-spinners';
 import LoadingSpinner from "./LoadingSpinner";
 
 const UserProfile = () => {

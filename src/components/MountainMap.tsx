@@ -13,7 +13,6 @@ import { get, post } from '@/utils/httpHelper';
 import { useAuth } from '@/context/authContext';
 import { toast, Toaster } from 'react-hot-toast';
 import { getNickname } from '@/utils/jwtDecoder';
-import warning from '@/assets/warning.png';
 import '@/styles/map.css';
 
 const MAX_ZOOM = 13;
