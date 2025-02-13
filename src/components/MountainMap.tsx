@@ -8,12 +8,13 @@ import peakMarker from '@/assets/mountain-marker.png';
 import saddleMarker from '@/assets/saddle-marker.png';
 import { Button, Offcanvas, Form, ListGroup } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faWarning } from '@fortawesome/free-solid-svg-icons';
 import { get, post } from '@/utils/httpHelper';
 import { useAuth } from '@/context/authContext';
 import { toast, Toaster } from 'react-hot-toast';
 import { getNickname } from '@/utils/jwtDecoder';
 import warning from '@/assets/warning.png';
+import '@/styles/map.css';
 
 const MAX_ZOOM = 13;
 
@@ -109,7 +110,7 @@ const MountainTrailsMap = () => {
             toast.success('Dodano do zdobytych szczytów!');
         } catch (error: any) {
             error.status === 400 ?
-                toast('Ten szczyt już jest zdobyty', { icon: warning})
+                toast('Ten szczyt już jest zdobyty', { icon: <FontAwesomeIcon icon={faWarning} color='#ebc500' /> })
                 :
                 toast.error('Coś poszło nie tak');
         }
@@ -119,8 +120,8 @@ const MountainTrailsMap = () => {
 
 
     return (
-        <div style={{ display: 'flex', height: '100vh' }}>
-            <MapContainer center={[50.0044, 20.5910]} zoom={13} style={{ flex: 1 }}>
+        <div style={{ display: 'flex', height: '100vh', justifyContent: "center" }}>
+            <MapContainer center={[50.0044, 20.5910]} zoom={13} style={{ height: '100%', width: '90%' }}>
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; OpenStreetMap contributors' />
                 <MapUpdater setPeaks={setPeaks} setSaddles={setSaddles} showSaddles={showSaddles} />
 
@@ -191,11 +192,12 @@ const MountainTrailsMap = () => {
                         onChange={handleSearchChange}
                         className="mb-3"
                     />
+
                     {filteredPeaks.length > 0 && (
                         <ListGroup>
                             {filteredPeaks.map((peak) => (
-                                <ListGroup.Item key={peak.id} action onClick={() => handleSuggestionClick(peak)}>
-                                    {peak.tags.name} ({peak.tags.ele} m)
+                                <ListGroup.Item key={peak.id} onClick={() => handleSuggestionClick(peak)} className='list-item'>
+                                    {peak.tags.name} ({peak.tags.ele} m n.p.m.)
                                 </ListGroup.Item>
                             ))}
                         </ListGroup>

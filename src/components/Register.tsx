@@ -35,54 +35,56 @@ const Register = () => {
   };
 
   return (
-    <div className='register-form'>
-      <h2 className="form-header">Rejestracja do systemu</h2>
-      <Form onSubmit={handleSubmit} className='form-controll'>
-        <Form.Group controlId="name" className="mb-3">
-          <Form.Label>Imię</Form.Label>
-          <Form.Control
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-        </Form.Group>
-        <Form.Group controlId="surname" className="mb-3">
-          <Form.Label>Nazwisko</Form.Label>
-          <Form.Control
-            type="text"
-            value={surname}
-            onChange={(e) => setSurname(e.target.value)}
-            required
-          />
-        </Form.Group>
-        <Form.Group controlId="nick" className="mb-3">
-          <Form.Label>Nickname</Form.Label>
-          <Form.Control
-            type="text"
-            value={nick}
-            onChange={(e) => setNick(e.target.value)}
-            required
-          />
-        </Form.Group>
-        <Form.Group controlId="password" className="mb-3">
-          <Form.Label>Hasło</Form.Label>
-          <Form.Control
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </Form.Group>
-        <Button
-          variant="primary"
-          type="submit"
-          className='submit-btn'
-        >
-          Utwórz konto
-        </Button>
-      </Form>
-      <Toaster position='top-right' toastOptions={{ duration: 3000 }} />
+    <div style={{ display: 'flex', justifyContent: 'center' }}>
+      <div className='register-form'>
+        <h2 className="form-header">Rejestracja do systemu</h2>
+        <Form onSubmit={handleSubmit} className='form-controll'>
+          <Form.Group controlId="name" className="mb-3">
+            <Form.Label>Imię</Form.Label>
+            <Form.Control
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+          </Form.Group>
+          <Form.Group controlId="surname" className="mb-3">
+            <Form.Label>Nazwisko</Form.Label>
+            <Form.Control
+              type="text"
+              value={surname}
+              onChange={(e) => setSurname(e.target.value)}
+              required
+            />
+          </Form.Group>
+          <Form.Group controlId="nick" className="mb-3">
+            <Form.Label>Nickname</Form.Label>
+            <Form.Control
+              type="text"
+              value={nick}
+              onChange={(e) => setNick(e.target.value)}
+              required
+            />
+          </Form.Group>
+          <Form.Group controlId="password" className="mb-3">
+            <Form.Label>Hasło</Form.Label>
+            <Form.Control
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </Form.Group>
+          <Button
+            variant="primary"
+            type="submit"
+            className='submit-btn'
+          >
+            Utwórz konto
+          </Button>
+        </Form>
+        <Toaster position='top-right' toastOptions={{ duration: 3000 }} />
+      </div>
     </div>
 
   );
