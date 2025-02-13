@@ -9,8 +9,11 @@ import saddleMarker from '@/assets/saddle-marker.png';
 import { Button, Offcanvas, Form, ListGroup } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
-import { get } from '@/utils/httpHelper';
+import { get, post } from '@/utils/httpHelper';
 import { useAuth } from '@/context/authContext';
+import { jwtDecode } from 'jwt-decode';
+import toast from 'react-hot-toast';
+import { getNickname } from '@/utils/jwtDecoder';
 
 const MAX_ZOOM = 13;
 
@@ -61,7 +64,13 @@ const MountainTrailsMap = () => {
     const [showSaddles, setShowSaddles] = useState(false);
     const [filteredPeaks, setFilteredPeaks] = useState<Peak[]>([]);
     const [showMenu, setShowMenu] = useState(false);
+    const [nick, setNick] = useState<string | undefined>(undefined);
     const { isAuthenticated } = useAuth();
+
+
+    useEffect(() => {
+        setNick(getNickname());
+    }, []);
 
     const peakIcon = new Icon({
         iconUrl: peakMarker,
@@ -94,6 +103,17 @@ const MountainTrailsMap = () => {
         setFilteredPeaks([]);
     };
 
+    const handleAddPeak = async (peakId: string) => {
+        try {
+            await post(`/users/${nick}/peaks`, { peakId })
+        } catch (error) {
+            toast.error('Error while adding new peak')
+        }
+
+    }
+
+
+
     return (
         <div style={{ display: 'flex', height: '100vh' }}>
             <MapContainer center={[50.0044, 20.5910]} zoom={13} style={{ flex: 1 }}>
@@ -108,7 +128,7 @@ const MountainTrailsMap = () => {
                             <small>Koordynaty: {peak.lat.toFixed(5)}, {peak.lon.toFixed(5)}</small>
                             {isAuthenticated &&
                                 <div className="mt-2 sm">
-                                    <Button>
+                                    <Button onClick={() => handleAddPeak(peak._id)}>
                                         Dodaj do zdobytych
                                     </Button>
                                 </div>}

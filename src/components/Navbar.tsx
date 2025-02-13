@@ -3,22 +3,28 @@ import { Link, Outlet } from 'react-router-dom';
 import { Navbar, Nav, Container, Dropdown, Form, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChartSimple, faMap, faUser, faPersonHiking } from '@fortawesome/free-solid-svg-icons';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Banner from '@/components/Banner';
 import { post } from '@/utils/httpHelper';
 import { toast, Toaster } from 'react-hot-toast';
 import { useAuth } from '@/context/authContext';
+import { getNickname } from '@/utils/jwtDecoder';
 
 const Header = () => {
-    const [nick, setNick] = useState<string>('');
+    const [nick, setNick] = useState<string | undefined>(undefined);
     const [password, setPassword] = useState<string>('');
     const { isAuthenticated, login, logout } = useAuth();
+
+    useEffect(() => {
+        setNick(getNickname());
+    }, []);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const response = await post('/user/login', { nick, password });
-            const { token } = response;
+            console.log(nick, password)
+            const response = await post('/users/login', { nick, password });
+            const { token } = response.data;
             login(token);
         } catch (error: any) {
             switch (error.status) {
@@ -97,7 +103,7 @@ const Header = () => {
                                 ) : (
                                     <div className="p-3 text-center">
                                         <p>Witaj, {nick}!</p>
-                                        <Link to="/profile" className="w-100 mb-2">
+                                        <Link to={`${nick}/profile`} className="w-100 mb-2">
                                             Przejdź do profilu
                                         </Link>
                                         <Button variant="outline-danger" onClick={logout} className="w-100">

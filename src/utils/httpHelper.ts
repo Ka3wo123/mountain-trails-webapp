@@ -10,7 +10,7 @@ const handleResponse = (response: any) => {
     return response;
 };
 
-export const get = async (endpoint: string, params: Record<string, string> = {}): Promise<any> => {
+export const get = async (endpoint: string, params: Record<string, any> = {}): Promise<any> => {
     try {
         const response = await axios.get(`${BASE_URL}${endpoint}`, {
             params,

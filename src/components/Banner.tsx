@@ -1,6 +1,7 @@
 import "@/styles/banner.css";
 import { useEffect, useState } from "react";
 import mountainsImage from "@/assets/mountains.png";
+import projectData from '@/../package.json';
 
 const Banner = () => {
     const [background, setBackground] = useState("");
@@ -30,9 +31,11 @@ const Banner = () => {
 
     return (
         <div className="banner" style={{ background }}>
+            
             <img src={mountainsImage} alt="Mountains" className="logo" />
         </div>
     );
+    
 };
 
 export default Banner;
