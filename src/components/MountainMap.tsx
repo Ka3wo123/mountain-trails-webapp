@@ -4,7 +4,8 @@ import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet';
 import { Peak } from '@/models/Peak';
 import { Saddle } from '@/models/Saddle';
 import { Icon } from 'leaflet';
-import icon from '@/assets/mountain-marker.png';
+import peakMarker from '@/assets/mountain-marker.png';
+import saddleMarker from '@/assets/saddle-marker.png';
 import { Button, Offcanvas, Form, ListGroup } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
@@ -30,11 +31,11 @@ const MapUpdater = ({ setPeaks, setSaddles, showSaddles }:
             if (map.getZoom() >= MAX_ZOOM) {
                 const peaksData = await get(`/peaks?${boundsParams}`);
 
-                setPeaks(peaksData.data);
+                setPeaks(peaksData.data.data);
 
                 if (showSaddles) {
                     const saddlesData = await get(`/saddles?${boundsParams}`);
-                    setSaddles(saddlesData.data);
+                    setSaddles(saddlesData.data.data);
                 }
             } else {
                 setPeaks([]);
@@ -55,17 +56,22 @@ const MapUpdater = ({ setPeaks, setSaddles, showSaddles }:
 
 const MountainTrailsMap = () => {
     const [peaks, setPeaks] = useState<Peak[]>([]);
-    const [_, setSaddles] = useState<Saddle[]>([]);
+    const [saddles, setSaddles] = useState<Saddle[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [showSaddles, setShowSaddles] = useState(false);
     const [filteredPeaks, setFilteredPeaks] = useState<Peak[]>([]);
     const [showMenu, setShowMenu] = useState(false);
     const { isAuthenticated } = useAuth();
 
-    const peakMarker = new Icon({
-        iconUrl: icon,
+    const peakIcon = new Icon({
+        iconUrl: peakMarker,
         iconSize: [30, 30]
     });
+
+    const saddleIcon = new Icon({
+        iconUrl: saddleMarker,
+        iconSize: [30, 30]
+    })
 
     const handleSearchChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value;
@@ -73,7 +79,7 @@ const MountainTrailsMap = () => {
 
         if (value) {
             const filteredData = await get(`/peaks?search=${encodeURIComponent(value)}`);
-            setFilteredPeaks(filteredData.data);
+            setFilteredPeaks(filteredData.data.data);
         } else {
             setFilteredPeaks([]);
         }
@@ -95,17 +101,25 @@ const MountainTrailsMap = () => {
                 <MapUpdater setPeaks={setPeaks} setSaddles={setSaddles} showSaddles={showSaddles} />
 
                 {peaks.map((peak) => (
-                    <Marker key={peak.id} position={[peak.lat, peak.lon]} icon={peakMarker} >
+                    <Marker key={peak.id} position={[peak.lat, peak.lon]} icon={peakIcon} >
                         <Popup>
                             <b>{peak.tags.name}</b><br />
                             Wysokość: {peak.tags.ele} m n.p.m.<br />
                             <small>Koordynaty: {peak.lat.toFixed(5)}, {peak.lon.toFixed(5)}</small>
                             {isAuthenticated &&
-                                <div className="mt-2">
+                                <div className="mt-2 sm">
                                     <Button>
                                         Dodaj do zdobytych
                                     </Button>
                                 </div>}
+                        </Popup>
+                    </Marker>
+                ))}
+                {showSaddles && saddles.map((saddle) => (
+                    <Marker key={saddle.id} position={[saddle.lat, saddle.lon]} icon={saddleIcon}>
+                        <Popup>
+                            <b>{saddle.tags.name}</b><br />
+                            Wysokość: {saddle.tags.ele} m n.p.m.
                         </Popup>
                     </Marker>
                 ))}

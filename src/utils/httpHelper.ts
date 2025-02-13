@@ -3,11 +3,11 @@ import axios from "axios";
 const BASE_URL = import.meta.env.VITE_PROD_URL || import.meta.env.VITE_DEV_URL;
 
 const handleResponse = (response: any) => {
-    if (response.status !== 200) {
-        console.log(response.data.error)
+    if (response.status < 200 || response.status >= 300) {
         return response.data.error;
     }    
-    return response.data;
+
+    return response;
 };
 
 export const get = async (endpoint: string, params: Record<string, string> = {}): Promise<any> => {

@@ -11,7 +11,7 @@ import { useAuth } from '@/context/authContext';
 
 const Header = () => {
     const [nick, setNick] = useState<string>('');
-    const [password, setPassword] = useState<string>('');    
+    const [password, setPassword] = useState<string>('');
     const { isAuthenticated, login, logout } = useAuth();
 
     const handleLogin = async (e: React.FormEvent) => {
@@ -20,8 +20,17 @@ const Header = () => {
             const response = await post('/user/login', { nick, password });
             const { token } = response;
             login(token);
-        } catch (error: any) {            
-            toast.error(error.message);
+        } catch (error: any) {
+            switch (error.status) {
+                case 404:
+                    toast.error('Użytkownik nie istnieje');
+                    break;
+                case 400:
+                    toast.error('Niepoprawne hasło');
+                    break;
+                default:
+                    toast.error('Coś poszło nie tak');
+            }
         }
     };
 
@@ -56,7 +65,7 @@ const Header = () => {
                             </Dropdown.Toggle>
                             <Dropdown.Menu variant={'dark'} style={{ width: '300px' }}>
                                 {!isAuthenticated ? (
-                                    <div className="p-3">                                        
+                                    <div className="p-3">
                                         <Form onSubmit={handleLogin} className="w-100">
                                             <div className="row">
                                                 <div className="col-12">

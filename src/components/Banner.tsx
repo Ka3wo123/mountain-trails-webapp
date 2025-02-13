@@ -7,7 +7,7 @@ const Banner = () => {
 
     useEffect(() => {
         const updateBackground = () => {
-            const hour = new Date().getHours();
+            const hour = new Date().getHours();            
 
             if (hour >= 18 && hour < 19) {
                 setBackground("linear-gradient(0deg,#fbd28b 20%, #ff9f40 25%, #f55312 30%, #060557 80%)");
@@ -23,6 +23,9 @@ const Banner = () => {
         };
 
         updateBackground();
+
+        const interval = setInterval(updateBackground, 60 * 1000);
+        return () => clearInterval(interval);
     }, []);
 
     return (

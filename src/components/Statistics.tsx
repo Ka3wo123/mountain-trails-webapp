@@ -1,15 +1,13 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faMountain } from '@fortawesome/free-solid-svg-icons';
-
-
+import { ProgressBar } from 'react-progressbar-fancy';
 
 const Statistics = () => {
     return (
-        <>
-            <span style={{color: "white"}}>Hello</span>
-            <FontAwesomeIcon icon={faMountain}></FontAwesomeIcon>
-        </>
-    )
+        <div>            
+            <div>
+                <ProgressBar score={100} progressColor='purple' label='Zdobyte szczyty'/>                
+            </div>
+        </div>
+    );
 }
 
 export default Statistics;
