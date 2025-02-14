@@ -14,6 +14,7 @@ import { useAuth } from '@/context/authContext';
 import { toast, Toaster } from 'react-hot-toast';
 import { getNickname } from '@/utils/jwtDecoder';
 import '@/styles/map.css';
+import { useDebounce } from '@/utils/hooks';
 
 const MAX_ZOOM = 13;
 
@@ -66,7 +67,8 @@ const MountainTrailsMap = () => {
     const [showMenu, setShowMenu] = useState(false);
     const [nick, setNick] = useState<string | undefined>(undefined);
     const { isAuthenticated } = useAuth();
-
+    const [page, setPage] = useState<number>(1);
+    const [totalDocuments, setTotalDocuments] = useState<number>(0);
 
     useEffect(() => {
         setNick(getNickname());
@@ -80,18 +82,31 @@ const MountainTrailsMap = () => {
     const saddleIcon = new Icon({
         iconUrl: saddleMarker,
         iconSize: [30, 30]
-    })
+    });
 
-    const handleSearchChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = event.target.value;
-        setSearchTerm(value);
+    const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
-        if (value) {
-            const filteredData = await get(`/peaks?search=${encodeURIComponent(value)}`);
-            setFilteredPeaks(filteredData.data.data);
-        } else {
-            setFilteredPeaks([]);
-        }
+    useEffect(() => {
+        const getFilteredData = async () => {
+            if (debouncedSearchTerm) {
+                const filteredData = await get(`/peaks?search=${encodeURIComponent(debouncedSearchTerm)}&page=${page}`);
+                if(page === 1) {
+                    setFilteredPeaks(filteredData.data.data);
+                } else {
+                    setFilteredPeaks((prev) => [...prev, ...filteredData.data.data])
+                }
+                setTotalDocuments(filteredData.data.total)
+            } else {
+                setFilteredPeaks([]);
+                setPage(1);
+            }
+        };
+        getFilteredData();
+    }, [debouncedSearchTerm, page]);
+
+    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(event.target.value);
+        setPage(1);
     };
 
     const handleSuggestionClick = (peak: Peak) => {
@@ -113,10 +128,11 @@ const MountainTrailsMap = () => {
                 :
                 toast.error('Coś poszło nie tak');
         }
+    };
 
+    const loadMore = () => {
+        setPage(page + 1);
     }
-
-
 
     return (
         <div style={{ display: 'flex', height: '100vh', justifyContent: "center" }}>
@@ -200,6 +216,9 @@ const MountainTrailsMap = () => {
                                 </ListGroup.Item>
                             ))}
                         </ListGroup>
+                    )}
+                    {filteredPeaks.length < totalDocuments && debouncedSearchTerm && (
+                        <Button onClick={loadMore}>Załaduj więcej ({totalDocuments - 10 * page} szczytów)</Button>
                     )}
                     <Form.Check
                         type="checkbox"
