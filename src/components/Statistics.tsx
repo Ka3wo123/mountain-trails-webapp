@@ -4,7 +4,8 @@ import { User } from '@/models/User';
 import { get } from '@/utils/httpHelper';
 import '@/styles/statistics.css';
 import toast from 'react-hot-toast';
-import LoadingSpinner from './LoadingSpinner';
+import LoadingSpinner from '@/components/LoadingSpinner';
+import { ListGroup } from 'react-bootstrap';
 
 const Statistics = () => {
     const [users, setUsers] = useState<User[]>([]);
@@ -32,17 +33,17 @@ const Statistics = () => {
         <div>
             <h1>Statystyki użytkowników</h1>
             {loading ? <LoadingSpinner /> : (
-                <div>
+                <ListGroup className='peaks-list'>
                     {users.map((user) => (
-                        <div key={user.nick} className="user-info">
+                        <ListGroup.Item key={user.nick} className="user-info">
                             <h2>
                                 <Link to={`/${user.nick}/profile`}>{user.nick} ({user.name} {user.surname})</Link>
                             </h2>
                             {(user.peaksAchieved.length / totalPeaks * 100).toFixed(4)}%
                             <progress value={parseFloat((user.peaksAchieved.length / totalPeaks).toFixed(7))}></progress>
-                        </div>
+                        </ListGroup.Item>
                     ))}
-                </div>
+                </ListGroup>
             )}
         </div>
     );

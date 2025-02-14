@@ -27,7 +27,7 @@ const App = () => {
   return (
     <AuthProvider>
       <RouterProvider router={router} />
-      <footer style={{ fontSize: '0.7rem', justifySelf: 'center'}}>
+      <footer style={{ fontSize: '0.7rem', justifySelf: 'center' }}>
         Mountain trails &copy; version: {projectData.version} | <a href='/about'>About</a>
       </footer>
 

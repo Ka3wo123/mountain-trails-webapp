@@ -1,6 +1,6 @@
 html,
 body {
-  background-color: black;
+  background-color: rgb(255, 255, 255);
   overflow-x: hidden;
 }
 
@@ -8,8 +8,7 @@ button {
   background: linear-gradient(135deg, #6a11cb, #2575fc);
   color: white;
   font-size: 1.1rem;
-  padding: 12px;
-  transition: 0.5s;
+  padding: 12px;  
 }
 
 button:hover {
