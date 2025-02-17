@@ -147,7 +147,7 @@ const MountainTrailsMap = () => {
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; OpenStreetMap contributors' />
                 <MapUpdater setPeaks={setPeaks} setSaddles={setSaddles} showSaddles={showSaddles} />
 
-                {peaks.map((peak) => (
+                {peaks && peaks.map((peak) => (
                     <Marker key={peak.id} position={[peak.lat, peak.lon]} icon={peakIcon} >
                         <Popup>
                             <b>{peak.tags.name}</b><br />
