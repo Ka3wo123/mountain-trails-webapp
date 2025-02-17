@@ -20,7 +20,8 @@ const About = () => {
         <ul>
           <li>Znajduj szczyty na mapie</li>
           <li>Śledź postęp w zdobywaniu szczytów</li>
-          <li>Sprawdzaj statystyki innych osób</li>          
+          <li>Sprawdzaj statystyki innych osób</li>    
+          <li>Dodawaj zdjęcia z wycieczek</li>      
         </ul>
       </section>
 
