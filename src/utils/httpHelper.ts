@@ -30,7 +30,7 @@ export const post = async (endpoint: string, data: Record<string, any>): Promise
         const response = await axios.post(`${BASE_URL}${endpoint}`, data, {
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`,
             },
         });
         return handleResponse(response);
@@ -44,7 +44,7 @@ export const postMimetype = async (endpoint: string, data: Record<string, any>):
     try {
         const response = await axios.post(`${BASE_URL}${endpoint}`, data, {
             headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`,
             },
         });
         return handleResponse(response);
@@ -59,7 +59,7 @@ export const put = async (endpoint: string, data: Record<string, any>): Promise<
         const response = await axios.put(`${BASE_URL}${endpoint}`, data, {
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`,
             },
         });
         return handleResponse(response);
@@ -74,7 +74,7 @@ export const del = async (endpoint: string, data?: Record<string, any>): Promise
         const response = await axios.delete(`${BASE_URL}${endpoint}`, {
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`,
             },
             data: data
         });

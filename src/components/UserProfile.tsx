@@ -10,6 +10,7 @@ import { faArrowLeft, faArrowRight, faMountain, faChevronDown, faChevronUp, faEx
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { ListGroup, Collapse, Button, Modal, Carousel, Dropdown } from "react-bootstrap";
 import toast, { Toaster } from "react-hot-toast";
+import { getNickname } from '@/utils/jwtDecoder';
 
 const UserProfile = () => {
     const { nick } = useParams<{ nick: string }>();
@@ -29,6 +30,7 @@ const UserProfile = () => {
     const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
     const limit = 10;
     const cloudinaryFolderName = import.meta.env.VITE_CLOUDINARY_FOLDER_NAME;
+    const token = localStorage.getItem('jwtToken');
 
     const fetchUserProfile = async () => {
         try {
@@ -194,10 +196,17 @@ const UserProfile = () => {
                                                 ) : <p>Brak zdjęć</p>
                                             }
 
-                                            <input type="file" onChange={(e) => { handleFilePick(e); }} />
-                                            {selectedFile && (
-                                                <button onClick={() => handleUpload(openPeakId!)}>Prześlij</button>
+                                            {token ? (
+                                                <>
+                                                    <input type="file" onChange={(e) => { handleFilePick(e); }} />
+                                                    {selectedFile && (
+                                                        <button onClick={() => handleUpload(openPeakId!)}>Prześlij</button>
+                                                    )}
+                                                </>
+                                            ) : (
+                                                <p>Zaloguj się, aby dodać zdjęcia.</p>
                                             )}
+
                                         </div>
                                     </Collapse>
 
@@ -241,10 +250,12 @@ const UserProfile = () => {
                                             <Dropdown>
                                                 <Dropdown.Toggle variant="light" id="dropdown-basic" style={{ background: 'none' }} />
                                                 <Dropdown.Menu>
-                                                    <Dropdown.Item onClick={() => handleDeleteImage(selectedPeakId, imgData.publicId)}>
-                                                        <FontAwesomeIcon icon={faTrash} style={{ marginRight: '6px' }} />
-                                                        Usuń zdjęcie
-                                                    </Dropdown.Item>
+                                                    {token && (
+                                                        <Dropdown.Item onClick={() => handleDeleteImage(selectedPeakId, imgData.publicId)}>
+                                                            <FontAwesomeIcon icon={faTrash} style={{ marginRight: '6px' }} />
+                                                            Usuń zdjęcie
+                                                        </Dropdown.Item>
+                                                    )}
                                                     <Dropdown.Item onClick={() => window.open(imgData.url, '_blank')}>
                                                         <FontAwesomeIcon icon={faExpand} style={{ marginRight: '6px' }} />
                                                         Zobacz w pełnym oknie
