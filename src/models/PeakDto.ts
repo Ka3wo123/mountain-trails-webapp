@@ -1,5 +1,5 @@
 export interface PeakDto {
-    _id: string;
+    peakId: string;
     name: string;
     ele: number;
     lat: number;

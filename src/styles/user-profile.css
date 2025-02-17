@@ -38,24 +38,6 @@ h3 {
     margin-right: 8px;
     color: #007bff;
 }
-.pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 15px;
-    margin-top: 20px;
-}
-
-.pagination button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    font-size: 1rem;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
 
 .pagination span {
     font-size: 1.2rem;
@@ -69,7 +51,7 @@ h3 {
 }
 
 .peak-image {
-    width: 50%;
+    width: 20%;
     height: auto;
     border-radius: 8px;
     margin-bottom: 10px;
@@ -104,19 +86,91 @@ h3 {
 }
 
 .item-details {
+    display: flex;
+    flex-direction: column;
     margin-top: 10px;
-    padding: 10px;
-    background-color: #f1f1f1;
-    border-radius: 5px;
+    padding: 15px;
+    background-color: #f9f9f9;  /* Soft background color */
+    border-radius: 8px;          /* Rounded corners */
+    border: 1px solid #ddd;     /* Light border for subtle separation */
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);  /* Subtle shadow effect */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.item-image-placeholder {
+
+.item-details input[type="file"] {
+    margin-top: 10px;
+    padding: 8px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #e0e0e0;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.item-details button {
+    margin-top: 10px;
+    padding: 8px 16px;
+    border: none;
+    cursor: pointer;    
+}
+
+.peak-image {
+    width: 20%;
+    margin: 10px;
+    height: auto;    
+    border-radius: 8px;
+    box-shadow: 5px 5px 4px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+}
+
+.peak-image:hover {
+    transform: scale(105%);
+}
+
+.peak-gallery-image {
     width: 100%;
-    height: 200px;
-    background-color: #d3d3d3;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.pagination {
     display: flex;
-    align-items: center;
     justify-content: center;
-    color: #555;
-    margin-bottom: 10px;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.pagination button {
+    color: white;
+    border: none;
+    border-radius: 4px;
+    border-radius: 10%;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.pagination button:hover {
+    background-color: #0056b3;
+}
+
+.pagination span {
+    font-size: 1em;
+    color: #000000;
+}
+
+.carousel-caption h5 {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    font-size: 18px;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 5px;
+}
+
+.image-options {
+    display: flex;
+    position: inherit;
+    z-index: 2;
 }

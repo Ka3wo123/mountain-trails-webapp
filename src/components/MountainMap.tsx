@@ -1,5 +1,5 @@
 import 'leaflet/dist/leaflet.css';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet';
 import { Peak } from '@/models/Peak';
 import { Saddle } from '@/models/Saddle';
@@ -15,6 +15,8 @@ import { toast, Toaster } from 'react-hot-toast';
 import { getNickname } from '@/utils/jwtDecoder';
 import '@/styles/map.css';
 import { useDebounce } from '@/utils/hooks';
+import L from 'leaflet';
+
 
 const MAX_ZOOM = 13;
 
@@ -25,7 +27,7 @@ const MapUpdater = ({ setPeaks, setSaddles, showSaddles }:
         showSaddles: boolean
     }) => {
 
-    const map = useMap();
+    const map = useMap();    
 
     useEffect(() => {
         const updateData = async () => {
@@ -69,7 +71,8 @@ const MountainTrailsMap = () => {
     const { isAuthenticated } = useAuth();
     const [page, setPage] = useState<number>(1);
     const [totalDocuments, setTotalDocuments] = useState<number>(0);
-
+    const mapRef = useRef<L.Map | null>(null);
+    
     useEffect(() => {
         setNick(getNickname());
     }, []);
@@ -109,16 +112,20 @@ const MountainTrailsMap = () => {
         setPage(1);
     };
 
-    const handleSuggestionClick = (peak: Peak) => {
-        const map = (document.querySelector('.leaflet-container') as any)?.__leaflet__;
+    const highlightedIcon = new L.Icon.Default();
+
+    const handleSuggestionClick = (peak: Peak) => {  
+        setShowMenu(false);      
+        const map = mapRef.current;
         if (map) {
-            map.setView([peak.lat, peak.lon], map.getZoom());
+            map.flyTo([peak.lat, peak.lon], 15);
+            L.marker([peak.lat, peak.lon], {icon: highlightedIcon}).addTo(map);            
         }
         setSearchTerm(peak.tags.name);
         setFilteredPeaks([]);
     };
 
-    const handleAddPeak = async (peakId: string) => {
+    const handleAddPeak = async (peakId: string) => {               
         try {
             await post(`/users/${nick}/peaks`, { peakId });
             toast.success('Dodano do zdobytych szczytów!');
@@ -126,7 +133,7 @@ const MountainTrailsMap = () => {
             error.status === 400 ?
                 toast('Ten szczyt już jest zdobyty', { icon: <FontAwesomeIcon icon={faWarning} color='#ebc500' /> })
                 :
-                toast.error('Coś poszło nie tak');
+                toast.error('Coś poszło nie tak');  
         }
     };
 
@@ -136,7 +143,7 @@ const MountainTrailsMap = () => {
 
     return (
         <div style={{ display: 'flex', height: '100vh', justifyContent: "center" }}>
-            <MapContainer center={[50.0044, 20.5910]} zoom={13} style={{ height: '100%', width: '90%' }}>
+            <MapContainer center={[50.0044, 20.5910]} zoom={13} style={{ height: '100%', width: '90%' }} ref={mapRef}>
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; OpenStreetMap contributors' />
                 <MapUpdater setPeaks={setPeaks} setSaddles={setSaddles} showSaddles={showSaddles} />
 
@@ -197,7 +204,7 @@ const MountainTrailsMap = () => {
                 }}
             >
                 <Offcanvas.Header closeButton>
-                    <Offcanvas.Title>Wyszukaj szczyt</Offcanvas.Title>
+                    <Offcanvas.Title>Wyszukaj szczyt</Offcanvas.Title>                    
                 </Offcanvas.Header>
                 <Offcanvas.Body>
                     <Form.Control

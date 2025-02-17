@@ -22,7 +22,6 @@ const Header = () => {
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            console.log(nick, password)
             const response = await post('/users/login', { nick, password });
             const { token } = response.data;
             login(token);

@@ -1,14 +1,15 @@
+import 'bootstrap/dist/css/bootstrap.min.css';
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { User } from "@/models/User";
-import { get } from "@/utils/httpHelper";
+import { del, get, postMimetype } from "@/utils/httpHelper";
 import { PeakDto } from "@/models/PeakDto";
 import '@/styles/user-profile.css';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faArrowRight, faMountain, faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faArrowRight, faMountain, faChevronDown, faChevronUp, faExpand, faTrash } from "@fortawesome/free-solid-svg-icons";
 import LoadingSpinner from "@/components/LoadingSpinner";
-import { ListGroup, Collapse, Button, Modal, Carousel } from "react-bootstrap";
-import axios from "axios";
+import { ListGroup, Collapse, Button, Modal, Carousel, Dropdown } from "react-bootstrap";
+import toast, { Toaster } from "react-hot-toast";
 
 const UserProfile = () => {
     const { nick } = useParams<{ nick: string }>();
@@ -18,23 +19,38 @@ const UserProfile = () => {
     const [totalPages, setTotalPages] = useState<number>(1);
     const [loading, setLoading] = useState<boolean>(true);
     const [totalSystemPeaks, setTotalSystemPeaks] = useState<number>(0);
-    const [openPeak, setOpenPeak] = useState<string | null>(null);
-    const [images, setImages] = useState<{ [key: string]: string }>({});
+    const [openPeakId, setOpenPeakId] = useState<string | null>(null);
+    const [images, setImages] = useState<{ [peakId: string]: { url: string, publicId: string }[] }>({});
     const [showModal, setShowModal] = useState(false);
-    const [selectedImage, setSelectedImage] = useState<number>(0);
+    const [selectedPeakId, setSelectedPeakId] = useState<string | null>(null);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
     const limit = 10;
+    const cloudinaryFolderName = import.meta.env.VITE_CLOUDINARY_FOLDER_NAME;
+
+    const fetchUserProfile = async () => {
+        try {
+            await get(`/users/${nick}`).then(response => {
+                setUser(response.data.data);
+
+                const imagesData: { [peakId: string]: { url: string, publicId: string }[] } = {};
+                response.data.data.peaksAchieved.forEach((peak: any) => {
+                    const peakImages = peak.imgData || [];
+                    imagesData[peak.peakId] = peakImages;
+                });
+                setImages(imagesData);
+                console.log(imagesData)
+
+            });
+        } catch (error) {
+            console.error("Error fetching user profile:", error);
+        }
+    };
 
     useEffect(() => {
-        const fetchUserProfile = async () => {
-            try {
-                const userResponse = await get(`/users/${nick}`);
-                setUser(userResponse.data.data);
-            } catch (error) {
-                console.error("Error fetching user profile:", error);
-            }
-        };
         fetchUserProfile();
     }, [nick]);
+
 
     useEffect(() => {
         const fetchUserPeaks = async () => {
@@ -52,39 +68,85 @@ const UserProfile = () => {
         fetchUserPeaks();
     }, [page, nick]);
 
-    useEffect(() => {
-        const fetchImages = async () => {
-            try {
-                const imageMap: { [key: string]: string } = {};
-                for (const peak of peaks) {
-                    const response = await axios.get(`https://placehold.co/600x400/000000/444?text=${peak.name}`, { responseType: 'blob' });
-                    const imageUrl = URL.createObjectURL(response.data);
-                    imageMap[peak._id] = imageUrl;
-                }
-                setImages(imageMap);
-            } catch (error) {
-                console.error("Error fetching images:", error);
-            }
-        };
-        if (peaks.length > 0) {
-            fetchImages();
-        }
-    }, [peaks]);
-
     const handlePageChange = (newPage: number) => {
         setPage(newPage);
     };
 
     const togglePeak = (peakId: string) => {
-        setOpenPeak(openPeak === peakId ? null : peakId);
+        if (openPeakId === peakId) {
+            setOpenPeakId(null);
+            setSelectedFile(null);
+        } else {
+            setOpenPeakId(peakId);
+            setSelectedFile(null); 
+        }
     };
+    
 
-    const openImageModal = (index: number) => {
-        setSelectedImage(index);
+    const openImageModal = (peakId: string) => {
+        setSelectedPeakId(peakId);
+        setSelectedImageIndex(0);
         setShowModal(true);
     };
 
     const closeModal = () => setShowModal(false);
+
+    const handleFilePick = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            setSelectedFile(file);
+        } else {
+            setSelectedFile(null);
+        }
+    };
+
+    const handleUpload = async (peakId: string) => {
+        const file = selectedFile;
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append("image", file);
+        formData.append("nick", nick!);
+        formData.append("peakId", peakId);
+        formData.append("folder", cloudinaryFolderName);
+
+
+        try {
+            await postMimetype('/photos/upload', formData);
+            await fetchUserProfile();
+            setSelectedFile(null);
+            toast.success('Zdjęcie zostało dodane');
+        } catch (error) {
+            console.error('Upload failed:', error);
+        }
+    };
+
+    const handleDeleteImage = async (peakId: string, publicId: string) => {
+        if (!publicId) {
+            console.error('Invalid publicId');
+            return;
+        }
+
+        try {
+            const response = await del(`/photos/delete`, { nick, peakId, publicId });
+
+            if (response.status !== 200) {
+                return toast.error('Coś poszło nie tak')
+            }
+
+            setImages((prevImages) => ({
+                ...prevImages,
+                [peakId]: prevImages[peakId].filter((imgData) => !imgData.url.includes(publicId)),
+            }));
+
+            toast.success('Zdjęcie zostało usunięte');
+            setShowModal(false);
+            await fetchUserProfile();
+        } catch (error) {
+            console.error('Error deleting image:', error);
+        }
+    };
+
 
     return (
         <div className="user-profile">
@@ -104,24 +166,34 @@ const UserProfile = () => {
                 peaks.length > 0 ? (
                     <div>
                         <ListGroup>
-                            {peaks.map((peak: PeakDto, index) => (
-                                <ListGroup.Item key={peak._id} className="expandable-item">
-                                    <div className="item-header" onClick={() => togglePeak(peak._id)}>
+                            {peaks.map((peak: PeakDto) => (
+                                <ListGroup.Item key={peak.peakId} className="expandable-item">
+                                    <div className="item-header" onClick={() => togglePeak(peak.peakId)}>
                                         <FontAwesomeIcon icon={faMountain} />
                                         {peak.name} - {peak.ele} m n.p.m.
-                                        <FontAwesomeIcon icon={openPeak === peak._id ? faChevronUp : faChevronDown} className="chevron" />
+                                        <FontAwesomeIcon icon={openPeakId === peak.peakId ? faChevronUp : faChevronDown} className="chevron" />
                                     </div>
-                                    <Collapse in={openPeak === peak._id}>
+                                    <Collapse in={openPeakId === peak.peakId}>
                                         <div className="item-details">
-                                            <img 
-                                                src={images[peak._id]} 
-                                                alt={peak.name} 
-                                                className="peak-image" 
-                                                onClick={() => openImageModal(index)}
-                                                style={{ cursor: 'pointer' }}
-                                            />                                            
+                                            {images[peak.peakId].length > 0 ?
+                                                (
+                                                    <img
+                                                        src={images[peak.peakId][0].url}
+                                                        alt={peak.name}
+                                                        className="peak-image"
+                                                        onClick={() => openImageModal(peak.peakId)}
+                                                        style={{ cursor: 'pointer' }}
+                                                    />
+                                                ) : <p>Brak zdjęć</p>
+                                            }
+
+                                            <input type="file" onChange={(e) => { handleFilePick(e); }} />
+                                            {selectedFile && (
+                                                <button onClick={() => handleUpload(openPeakId!)}>Prześlij</button>
+                                            )}
                                         </div>
                                     </Collapse>
+
                                 </ListGroup.Item>
                             ))}
                         </ListGroup>
@@ -130,7 +202,7 @@ const UserProfile = () => {
                             <Button onClick={() => handlePageChange(page - 1)} disabled={page === 1}>
                                 <FontAwesomeIcon icon={faArrowLeft} />
                             </Button>
-                            <span>{page} of {totalPages}</span>
+                            <span>{page} z {totalPages}</span>
                             <Button onClick={() => handlePageChange(page + 1)} disabled={page === totalPages}>
                                 <FontAwesomeIcon icon={faArrowRight} />
                             </Button>
@@ -140,33 +212,41 @@ const UserProfile = () => {
                     <p>Brak zdobytych szczytów.</p>
                 )
             )}
-            
+
             <Modal show={showModal} onHide={closeModal} centered>
-                <Modal.Header closeButton>
-                    <Modal.Title>Zdjęcia szczytów</Modal.Title>
-                </Modal.Header>
                 <Modal.Body>
-                    <Carousel activeIndex={selectedImage} onSelect={setSelectedImage} interval={3000}>
-                        {peaks.map((peak) => (
-                            <Carousel.Item key={peak._id}>
-                                <img
-                                    className="d-block w-100"
-                                    src={images[peak._id]}
-                                    alt={peak.name}
-                                />
-                                <Carousel.Caption>
-                                    <h5>{peak.name}</h5>
-                                </Carousel.Caption>
-                            </Carousel.Item>
-                        ))}
+                    <Carousel fade={false} activeIndex={selectedImageIndex} onSelect={(index: number) => setSelectedImageIndex(index)}>
+                        {selectedPeakId &&
+                            images[selectedPeakId].map((imgData, index: number) => {
+                                return (
+                                    <Carousel.Item key={imgData.publicId}>
+                                        <div className="image-options">
+                                            <Dropdown>
+                                                <Dropdown.Toggle variant="light" id="dropdown-basic" style={{ background: 'none' }}/>
+                                                <Dropdown.Menu>
+                                                    <Dropdown.Item onClick={() => handleDeleteImage(selectedPeakId, imgData.publicId)}>
+                                                        <FontAwesomeIcon icon={faTrash} style={{marginRight: '6px'}} />
+                                                        Usuń zdjęcie
+                                                    </Dropdown.Item>
+                                                    <Dropdown.Item onClick={() => window.open(imgData.url, '_blank')}>
+                                                        <FontAwesomeIcon icon={faExpand} style={{marginRight: '6px'}}/>
+                                                        Zobacz w pełnym oknie
+                                                    </Dropdown.Item>
+                                                </Dropdown.Menu>
+                                            </Dropdown>
+                                        </div>
+                                        <img
+                                            className="peak-gallery-image"
+                                            src={imgData.url}
+                                            alt={`Peak Image ${index + 1}`}
+                                        />                                        
+                                    </Carousel.Item>
+                                );
+                            })}
                     </Carousel>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={closeModal}>
-                        Zamknij
-                    </Button>
-                </Modal.Footer>
+                </Modal.Body>                
             </Modal>
+            <Toaster position='top-right' toastOptions={{ duration: 3000 }} />
         </div>
     );
 }

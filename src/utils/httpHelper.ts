@@ -5,7 +5,7 @@ const BASE_URL = import.meta.env.VITE_PROD_URL || import.meta.env.VITE_DEV_URL;
 const handleResponse = (response: any) => {
     if (response.status < 200 || response.status >= 300) {
         return response.data.error;
-    }    
+    }
 
     return response;
 };
@@ -40,6 +40,20 @@ export const post = async (endpoint: string, data: Record<string, any>): Promise
     }
 };
 
+export const postMimetype = async (endpoint: string, data: Record<string, any>): Promise<any> => {
+    try {
+        const response = await axios.post(`${BASE_URL}${endpoint}`, data, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            },
+        });
+        return handleResponse(response);
+    } catch (error) {
+        console.error('Error in POST request:', error);
+        throw error;
+    }
+}
+
 export const put = async (endpoint: string, data: Record<string, any>): Promise<any> => {
     try {
         const response = await axios.put(`${BASE_URL}${endpoint}`, data, {
@@ -55,13 +69,14 @@ export const put = async (endpoint: string, data: Record<string, any>): Promise<
     }
 };
 
-export const del = async (endpoint: string): Promise<any> => {
+export const del = async (endpoint: string, data?: Record<string, any>): Promise<any> => {
     try {
         const response = await axios.delete(`${BASE_URL}${endpoint}`, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${localStorage.getItem('token')}`,
             },
+            data: data
         });
         return handleResponse(response);
     } catch (error) {
