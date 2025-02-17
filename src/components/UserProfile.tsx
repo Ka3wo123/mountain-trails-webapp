@@ -10,7 +10,6 @@ import { faArrowLeft, faArrowRight, faMountain, faChevronDown, faChevronUp, faEx
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { ListGroup, Collapse, Button, Modal, Carousel, Dropdown } from "react-bootstrap";
 import toast, { Toaster } from "react-hot-toast";
-import { getNickname } from '@/utils/jwtDecoder';
 
 const UserProfile = () => {
     const { nick } = useParams<{ nick: string }>();
