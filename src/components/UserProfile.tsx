@@ -18,6 +18,8 @@ const UserProfile = () => {
     const [page, setPage] = useState<number>(1);
     const [totalPages, setTotalPages] = useState<number>(1);
     const [loading, setLoading] = useState<boolean>(true);
+    const [isUploading, setIsUploading] = useState<boolean>(false);
+    const [isDeleting, setIsDeleting] = useState<boolean>(false);
     const [totalSystemPeaks, setTotalSystemPeaks] = useState<number>(0);
     const [openPeakId, setOpenPeakId] = useState<string | null>(null);
     const [images, setImages] = useState<{ [peakId: string]: { url: string, publicId: string }[] }>({});
@@ -78,10 +80,10 @@ const UserProfile = () => {
             setSelectedFile(null);
         } else {
             setOpenPeakId(peakId);
-            setSelectedFile(null); 
+            setSelectedFile(null);
         }
     };
-    
+
 
     const openImageModal = (peakId: string) => {
         setSelectedPeakId(peakId);
@@ -104,12 +106,13 @@ const UserProfile = () => {
         const file = selectedFile;
         if (!file) return;
 
+        setIsUploading(true);
+
         const formData = new FormData();
         formData.append("image", file);
         formData.append("nick", nick!);
         formData.append("peakId", peakId);
         formData.append("folder", cloudinaryFolderName);
-
 
         try {
             await postMimetype('/photos/upload', formData);
@@ -118,8 +121,11 @@ const UserProfile = () => {
             toast.success('Zdjęcie zostało dodane');
         } catch (error) {
             console.error('Upload failed:', error);
+        } finally {
+            setIsUploading(false);
         }
     };
+
 
     const handleDeleteImage = async (peakId: string, publicId: string) => {
         if (!publicId) {
@@ -128,6 +134,7 @@ const UserProfile = () => {
         }
 
         try {
+            setIsDeleting(true);
             const response = await del(`/photos/delete`, { nick, peakId, publicId });
 
             if (response.status !== 200) {
@@ -144,6 +151,8 @@ const UserProfile = () => {
             await fetchUserProfile();
         } catch (error) {
             console.error('Error deleting image:', error);
+        } finally {
+            setIsDeleting(false);
         }
     };
 
@@ -160,9 +169,7 @@ const UserProfile = () => {
             </div>
 
             <h3>Lista zdobytych szczytów</h3>
-            {loading ? (
-                <LoadingSpinner />
-            ) : (
+            {(
                 peaks.length > 0 ? (
                     <div>
                         <ListGroup>
@@ -213,6 +220,16 @@ const UserProfile = () => {
                 )
             )}
 
+            {loading && (
+                <LoadingSpinner label="Pobieranie zdobytych szczytów" />
+            )}
+            {isUploading && (
+                <LoadingSpinner label="Przesyłanie zdjęcia" />
+            )}
+            {isDeleting && (
+                <LoadingSpinner label="Usuwanie zdjęcia" />
+            )}
+
             <Modal show={showModal} onHide={closeModal} centered>
                 <Modal.Body>
                     <Carousel fade={false} activeIndex={selectedImageIndex} onSelect={(index: number) => setSelectedImageIndex(index)}>
@@ -222,14 +239,14 @@ const UserProfile = () => {
                                     <Carousel.Item key={imgData.publicId}>
                                         <div className="image-options">
                                             <Dropdown>
-                                                <Dropdown.Toggle variant="light" id="dropdown-basic" style={{ background: 'none' }}/>
+                                                <Dropdown.Toggle variant="light" id="dropdown-basic" style={{ background: 'none' }} />
                                                 <Dropdown.Menu>
                                                     <Dropdown.Item onClick={() => handleDeleteImage(selectedPeakId, imgData.publicId)}>
-                                                        <FontAwesomeIcon icon={faTrash} style={{marginRight: '6px'}} />
+                                                        <FontAwesomeIcon icon={faTrash} style={{ marginRight: '6px' }} />
                                                         Usuń zdjęcie
                                                     </Dropdown.Item>
                                                     <Dropdown.Item onClick={() => window.open(imgData.url, '_blank')}>
-                                                        <FontAwesomeIcon icon={faExpand} style={{marginRight: '6px'}}/>
+                                                        <FontAwesomeIcon icon={faExpand} style={{ marginRight: '6px' }} />
                                                         Zobacz w pełnym oknie
                                                     </Dropdown.Item>
                                                 </Dropdown.Menu>
@@ -239,12 +256,12 @@ const UserProfile = () => {
                                             className="peak-gallery-image"
                                             src={imgData.url}
                                             alt={`Peak Image ${index + 1}`}
-                                        />                                        
+                                        />
                                     </Carousel.Item>
                                 );
                             })}
                     </Carousel>
-                </Modal.Body>                
+                </Modal.Body>
             </Modal>
             <Toaster position='top-right' toastOptions={{ duration: 3000 }} />
         </div>
