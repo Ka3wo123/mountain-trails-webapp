@@ -39,7 +39,7 @@ const Statistics = () => {
                             <Link to={`/${user.nick}/profile`}>{user.nick} ({user.name} {user.surname})</Link>
                         </h2>
                         {(user.peaksAchieved.length / totalPeaks * 100).toFixed(4)}%
-                        <progress value={parseFloat((user.peaksAchieved.length / totalPeaks).toFixed(7))}></progress>
+                        <progress value={parseFloat((user.peaksAchieved.length / totalPeaks).toFixed(6))}></progress>
                     </ListGroup.Item>
                 ))}
             </ListGroup>
