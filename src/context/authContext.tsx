@@ -1,4 +1,3 @@
-import axiosInstance from '@/utils/axiosInstance';
 import { post } from '@/utils/httpHelper';
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 
