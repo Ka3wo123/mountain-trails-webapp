@@ -50,13 +50,6 @@ h3 {
     height: 200px;
 }
 
-.peak-image {
-    width: 20%;
-    height: auto;
-    border-radius: 8px;
-    margin-bottom: 10px;
-}
-
 .expandable-item {
     cursor: pointer;
     padding: 10px;
@@ -88,13 +81,12 @@ h3 {
 .item-details {
     display: flex;
     flex-direction: column;
-    margin-top: 10px;
+    margin-top: 8px;
     padding: 15px;
-    background-color: #f9f9f9;  /* Soft background color */
-    border-radius: 8px;          /* Rounded corners */
-    border: 1px solid #ddd;     /* Light border for subtle separation */
-    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);  /* Subtle shadow effect */
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 
@@ -102,6 +94,7 @@ h3 {
     margin-top: 10px;
     padding: 8px;
     font-size: 1rem;
+    max-width: 50%;
     border: 1px solid #ccc;
     border-radius: 5px;
     background-color: #e0e0e0;
@@ -113,20 +106,20 @@ h3 {
     margin-top: 10px;
     padding: 8px 16px;
     border: none;
-    cursor: pointer;    
+    cursor: pointer;
 }
 
 .peak-image {
     width: 20%;
     margin: 10px;
-    height: auto;    
+    height: auto;
     border-radius: 8px;
     box-shadow: 5px 5px 4px rgba(0, 0, 0, 0.2);
     transition: transform 0.3s ease;
 }
 
 .peak-image:hover {
-    transform: scale(105%);
+    transform: scale(105%) !important;
 }
 
 .peak-gallery-image {
@@ -173,4 +166,30 @@ h3 {
     display: flex;
     position: inherit;
     z-index: 2;
+}
+
+.peak-images-container {
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-start;
+    margin-left: 10%;        
+}
+
+.peak-image:nth-child(1) {
+    transform: rotate(-10deg) translateX(-20px);
+    z-index: 1; 
+}
+
+.peak-image:nth-child(2) {
+    transform: rotate(0deg);
+    z-index: 2;
+    position: relative;
+    left: -100px; 
+}
+
+.peak-image:nth-child(3) {
+    transform: rotate(10deg) translateX(20px);
+    z-index: 3;
+    position: relative;
+    left: -200px;
 }

@@ -183,17 +183,21 @@ const UserProfile = () => {
                                     </div>
                                     <Collapse in={openPeakId === peak.peakId}>
                                         <div className="item-details">
-                                            {images[peak.peakId].length > 0 ?
-                                                (
-                                                    <img
-                                                        src={images[peak.peakId][0].url}
-                                                        alt={peak.name}
-                                                        className="peak-image"
-                                                        onClick={() => openImageModal(peak.peakId)}
-                                                        style={{ cursor: 'pointer' }}
-                                                    />
-                                                ) : <p>Brak zdjęć</p>
-                                            }
+                                            {images[peak.peakId] && images[peak.peakId].length > 0 ? (
+                                                <div className="peak-images-container">
+                                                    {images[peak.peakId].slice(0, 3).map((imgData, index) => (
+                                                        <img
+                                                            key={index}
+                                                            src={imgData.url}
+                                                            alt={`${peak.name} - image ${index + 1}`}
+                                                            className="peak-image"
+                                                            onClick={() => openImageModal(peak.peakId)}
+                                                            style={{ cursor: 'pointer' }}
+                                                        />
+                                                    ))}
+                                                </div>
+                                            ) : <p>Brak zdjęć</p>}                                            
+                                            
 
                                             {token ? (
                                                 <>

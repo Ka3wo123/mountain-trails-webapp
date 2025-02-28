@@ -1,7 +1,9 @@
+import axiosInstance from '@/utils/axiosInstance';
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 
 interface AuthContextType {
     isAuthenticated: boolean;
+    accessToken: string | null;
     login: (token: string) => void;
     logout: () => void;
 }
@@ -13,29 +15,34 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-    const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+    const [accessToken, setAccessToken] = useState<string|null>(null);
 
     useEffect(() => {
-        const token = localStorage.getItem('jwtToken');
-        if (token) {
-            setIsAuthenticated(true);
-        }
+        const fetchNewAccessToken = async () => {
+            try {
+                const response = await axiosInstance.post('/users/refresh-token', {}, {withCredentials: true});
+                setAccessToken(response.data.accessToken);
+            } catch(error) {
+                console.error('Could not refresh token', error);
+            }
+        }        
+        fetchNewAccessToken();
     }, []);
 
     const login = (token: string) => {
         localStorage.setItem('jwtToken', token);
-        setIsAuthenticated(true);
         window.location.reload();
     };
 
     const logout = () => {
+        setAccessToken(null);
         localStorage.removeItem('jwtToken');
-        setIsAuthenticated(false);
+        axiosInstance.post('/users/logout', {}, { withCredentials: true });
         window.location.reload();
     };
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+        <AuthContext.Provider value={{ isAuthenticated: !!accessToken, accessToken, login, logout }}>
             {children}
         </AuthContext.Provider>
     );

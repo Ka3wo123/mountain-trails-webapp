@@ -20,7 +20,7 @@ const Statistics = () => {
                 setUsers(response.data.data);
                 setTotalPeaks(peaksResponse.data.total);
                 setLoading(false);
-            } catch (err) {
+            } catch (error: any) {
                 setLoading(false);
                 toast.error('Coś poszło nie tak');
             }
