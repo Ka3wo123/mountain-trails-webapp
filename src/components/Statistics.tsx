@@ -22,7 +22,7 @@ const Statistics = () => {
                 setLoading(false);
             } catch (error: any) {
                 setLoading(false);
-                toast.error('Coś poszło nie tak');
+                toast.error('Coś poszło nie tak' + error);
             }
         };
 
