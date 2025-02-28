@@ -15,17 +15,17 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-    const [accessToken, setAccessToken] = useState<string|null>(null);
+    const [accessToken, setAccessToken] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchNewAccessToken = async () => {
             try {
-                const response = await axiosInstance.post('/users/refresh-token', {}, {withCredentials: true});
+                const response = await axiosInstance.post('/users/refresh-token', {}, { withCredentials: true });
                 setAccessToken(response.data.accessToken);
-            } catch(error) {
+            } catch (error) {
                 console.error('Could not refresh token', error);
             }
-        }        
+        }
         fetchNewAccessToken();
     }, []);
 
