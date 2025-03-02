@@ -44,10 +44,14 @@ export const ERROR_MESSAGES = {
 };
 export const SUCCESS_MESSAGES = {
   PEAK_ADDED: 'Dodano do zdobytych szczytów!',
+  PEAK_DELETED: 'Usunięto ze zdobytych szczytów',
   ACCOUNT_CREATED: (nick: string) => `Utworzono nowe konto dla ${nick}`,
   PHOTO_UPLOADED: 'Zdjęcie zostało dodane',
   PHOTO_DELETED: 'Zdjęcie zostało usunięte',
 };
+export const ALERT_MESSAGES = {
+  PEAK_DELETE: 'Czy na pewno chcesz usunąć ten szczyt ze zdobytych?'
+}
 export const HTTP_STATUS = {
   OK: 200,
   BAD_REQUEST: 400,

@@ -93,7 +93,7 @@ h3 {
   margin-top: 10px;
   padding: 8px;
   font-size: 1rem;
-  max-width: 50%;
+  max-width: 100%;
   border: 1px solid #ccc;
   border-radius: 5px;
   background-color: #e0e0e0;
@@ -191,4 +191,9 @@ h3 {
   z-index: 3;
   position: relative;
   left: -200px;
+}
+
+.settings {
+  display: flex;
+  justify-content: space-around;
 }

@@ -18,13 +18,14 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 import { ListGroup, Collapse, Button, Modal, Carousel, Dropdown } from 'react-bootstrap';
 import toast, { Toaster } from 'react-hot-toast';
 import axiosInstance from '@/utils/axiosInstance';
-import {
-  ACCESS_TOKEN,
+import {  
+  ALERT_MESSAGES,
   API_ENDPOINTS,
   ERROR_MESSAGES,
   HTTP_STATUS,
   SUCCESS_MESSAGES,
 } from '@/constants';
+import { useAuth } from '@/context/authContext';
 
 const UserProfile = () => {
   const { nick } = useParams<{ nick: string }>();
@@ -46,7 +47,7 @@ const UserProfile = () => {
   const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
   const limit = 10;
   const cloudinaryFolderName = import.meta.env.VITE_CLOUDINARY_FOLDER_NAME;
-  const token = localStorage.getItem(ACCESS_TOKEN);
+  const { isAuthenticated } = useAuth();
 
   const fetchUserProfile = async () => {
     try {
@@ -67,26 +68,28 @@ const UserProfile = () => {
     }
   };
 
+  const fetchUserPeaks = async () => {
+    try {
+      const peaksResponse = await axiosInstance.get(API_ENDPOINTS.USERS.PEAK_FOR(nick!), {
+        params: { page, limit },
+      });
+      setPeaks(peaksResponse.data.data);
+      setTotalPages(peaksResponse.data.totalPages);
+      setTotalSystemPeaks(peaksResponse.data.totalSystemPeaks);
+    } catch (error) {
+      console.error('Error fetching user peaks:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    fetchUserProfile();
+    
   }, [nick]);
 
   useEffect(() => {
-    const fetchUserPeaks = async () => {
-      try {
-        const peaksResponse = await axiosInstance.get(API_ENDPOINTS.USERS.PEAK_FOR(nick!), {
-          params: { page, limit },
-        });
-        setPeaks(peaksResponse.data.data);
-        setTotalPages(peaksResponse.data.totalPages);
-        setTotalSystemPeaks(peaksResponse.data.totalSystemPeaks);
-      } catch (error) {
-        console.error('Error fetching user peaks:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchUserPeaks();
+    fetchUserProfile();
   }, [page, nick]);
 
   const handlePageChange = (newPage: number) => {
@@ -169,12 +172,30 @@ const UserProfile = () => {
       }));
 
       toast.success(SUCCESS_MESSAGES.PHOTO_DELETED);
-      setShowModal(false);
+      setShowModal(false);      
       await fetchUserProfile();
+
     } catch (error) {
       console.error('Error deleting image:', error);
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const handleDeletePeak = async (peakId: string) => {
+    const isConfirmed = window.confirm(ALERT_MESSAGES.PEAK_DELETE);
+    if (!isConfirmed) return;
+    try {
+      await axiosInstance.delete(API_ENDPOINTS.USERS.PEAK_FOR(nick!), {
+        data: {
+          peakId: peakId,
+        },
+      });
+      toast.success(SUCCESS_MESSAGES.PEAK_DELETED);
+      await fetchUserProfile();
+      await fetchUserPeaks();
+    } catch (error) {
+      toast.error(ERROR_MESSAGES.SERVER_ERROR);
     }
   };
 
@@ -207,41 +228,51 @@ const UserProfile = () => {
                   />
                 </div>
                 <Collapse in={openPeakId === peak.peakId}>
-                  <div className="item-details">
-                    {images[peak.peakId] && images[peak.peakId].length > 0 ? (
-                      <div className="peak-images-container">
-                        {images[peak.peakId].slice(0, 3).map((imgData, index) => (
-                          <img
-                            key={index}
-                            src={imgData.url}
-                            alt={`${peak.name} - image ${index + 1}`}
-                            className="peak-image"
-                            onClick={() => openImageModal(peak.peakId)}
-                            style={{
-                              cursor: 'pointer',
+                  <div>
+                    <div className="item-details">
+                      {images[peak.peakId] && images[peak.peakId].length > 0 ? (
+                        <div className="peak-images-container">
+                          {images[peak.peakId].slice(0, 3).map((imgData, index) => (
+                            <img
+                              key={index}
+                              src={imgData.url}
+                              alt={`${peak.name} - image ${index + 1}`}
+                              className="peak-image"
+                              onClick={() => openImageModal(peak.peakId)}
+                              style={{
+                                cursor: 'pointer',
+                              }}
+                            />
+                          ))}
+                        </div>
+                      ) : (
+                        <p>Brak zdjęć</p>
+                      )}
+                      {isAuthenticated ? (
+                        <>
+                          <input
+                            type="file"
+                            onChange={(e) => {
+                              handleFilePick(e);
                             }}
                           />
-                        ))}
+                          {selectedFile && (
+                            <Button onClick={() => handleUpload(openPeakId!)}>Prześlij</Button>
+                          )}
+                        </>
+                      ) : (
+                        <p>Zaloguj się, aby dodać zdjęcia.</p>
+                      )}
+                      <hr />
+                      <div className="settings">
+                        <Button
+                          variant="outline-danger"
+                          onClick={() => handleDeletePeak(peak.peakId)}
+                        >
+                          Usuń ze zdobytych
+                        </Button>
                       </div>
-                    ) : (
-                      <p>Brak zdjęć</p>
-                    )}
-
-                    {token ? (
-                      <>
-                        <input
-                          type="file"
-                          onChange={(e) => {
-                            handleFilePick(e);
-                          }}
-                        />
-                        {selectedFile && (
-                          <button onClick={() => handleUpload(openPeakId!)}>Prześlij</button>
-                        )}
-                      </>
-                    ) : (
-                      <p>Zaloguj się, aby dodać zdjęcia.</p>
-                    )}
+                    </div>
                   </div>
                 </Collapse>
               </ListGroup.Item>
@@ -287,7 +318,7 @@ const UserProfile = () => {
                           style={{ background: 'none' }}
                         />
                         <Dropdown.Menu>
-                          {token && (
+                          {isAuthenticated && (
                             <Dropdown.Item
                               onClick={() => handleDeleteImage(selectedPeakId, imgData.publicId)}
                             >
