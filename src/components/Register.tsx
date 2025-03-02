@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
-import { post } from '@/utils/httpHelper';
 import { toast, Toaster } from 'react-hot-toast';
 import '@/styles/registration.css';
+import axiosInstance from '@/utils/axiosInstance';
 
 
 const Register = () => {
@@ -14,7 +14,7 @@ const Register = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await post('/users/register', {
+      await axiosInstance.post('/users/register', {
         name,
         surname,
         nick,

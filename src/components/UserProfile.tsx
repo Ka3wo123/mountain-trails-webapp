@@ -2,7 +2,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { User } from "@/models/User";
-import { del, get, postMimetype } from "@/utils/httpHelper";
 import { PeakDto } from "@/models/PeakDto";
 import '@/styles/user-profile.css';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -10,6 +9,7 @@ import { faArrowLeft, faArrowRight, faMountain, faChevronDown, faChevronUp, faEx
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { ListGroup, Collapse, Button, Modal, Carousel, Dropdown } from "react-bootstrap";
 import toast, { Toaster } from "react-hot-toast";
+import axiosInstance from '@/utils/axiosInstance';
 
 const UserProfile = () => {
     const { nick } = useParams<{ nick: string }>();
@@ -33,7 +33,7 @@ const UserProfile = () => {
 
     const fetchUserProfile = async () => {
         try {
-            await get(`/users/${nick}`).then(response => {
+            await axiosInstance.get(`/users/${nick}`).then(response => {
                 setUser(response.data.data);
 
                 const imagesData: { [peakId: string]: { url: string, publicId: string }[] } = {};
@@ -58,7 +58,7 @@ const UserProfile = () => {
     useEffect(() => {
         const fetchUserPeaks = async () => {
             try {
-                const peaksResponse = await get(`/users/${nick}/peaks`, { page, limit });
+                const peaksResponse = await axiosInstance.get(`/users/${nick}/peaks`, { params: { page, limit } });
                 setPeaks(peaksResponse.data.data);
                 setTotalPages(peaksResponse.data.totalPages);
                 setTotalSystemPeaks(peaksResponse.data.totalSystemPeaks);
@@ -116,7 +116,7 @@ const UserProfile = () => {
         formData.append("folder", cloudinaryFolderName);
 
         try {
-            await postMimetype('/photos/upload', formData);
+            await axiosInstance.post('/photos/upload', formData);
             await fetchUserProfile();
             setSelectedFile(null);
             toast.success('Zdjęcie zostało dodane');
@@ -136,7 +136,7 @@ const UserProfile = () => {
 
         try {
             setIsDeleting(true);
-            const response = await del(`/photos/delete`, { nick, peakId, publicId });
+            const response = await axiosInstance.delete(`/photos/delete`, { data: { nick, peakId, publicId } });
 
             if (response.status !== 200) {
                 return toast.error('Coś poszło nie tak')
@@ -196,8 +196,8 @@ const UserProfile = () => {
                                                         />
                                                     ))}
                                                 </div>
-                                            ) : <p>Brak zdjęć</p>}                                            
-                                            
+                                            ) : <p>Brak zdjęć</p>}
+
 
                                             {token ? (
                                                 <>

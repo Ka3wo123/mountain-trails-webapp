@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { User } from '@/models/User';
-import { get } from '@/utils/httpHelper';
 import '@/styles/statistics.css';
 import toast from 'react-hot-toast';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { ListGroup } from 'react-bootstrap';
+import axiosInstance from '@/utils/axiosInstance';
 
 const Statistics = () => {
     const [users, setUsers] = useState<User[]>([]);
@@ -15,8 +15,8 @@ const Statistics = () => {
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const response = await get('/users');
-                const peaksResponse = await get('/peaks/count');
+                const response = await axiosInstance.get('/users');
+                const peaksResponse = await axiosInstance.get('/peaks/count');
                 setUsers(response.data.data);
                 setTotalPeaks(peaksResponse.data.total);
                 setLoading(false);

@@ -9,13 +9,13 @@ import saddleMarker from '@/assets/saddle-marker.png';
 import { Button, Offcanvas, Form, ListGroup } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faWarning } from '@fortawesome/free-solid-svg-icons';
-import { get, post } from '@/utils/httpHelper';
 import { useAuth } from '@/context/authContext';
 import { toast, Toaster } from 'react-hot-toast';
 import { getNickname } from '@/utils/jwtDecoder';
 import '@/styles/map.css';
 import { useDebounce } from '@/utils/hooks';
 import L from 'leaflet';
+import axiosInstance from '@/utils/axiosInstance';
 
 
 const MAX_ZOOM = 13;
@@ -27,7 +27,7 @@ const MapUpdater = ({ setPeaks, setSaddles, showSaddles }:
         showSaddles: boolean
     }) => {
 
-    const map = useMap();    
+    const map = useMap();
 
     useEffect(() => {
         const updateData = async () => {
@@ -35,12 +35,12 @@ const MapUpdater = ({ setPeaks, setSaddles, showSaddles }:
             const boundsParams = `lat1=${bounds.getSouthWest().lat}&lon1=${bounds.getSouthWest().lng}&lat2=${bounds.getNorthEast().lat}&lon2=${bounds.getNorthEast().lng}`;
 
             if (map.getZoom() >= MAX_ZOOM) {
-                const peaksData = await get(`/peaks?${boundsParams}`);
+                const peaksData = await axiosInstance.get(`/peaks?${boundsParams}`);
 
                 setPeaks(peaksData.data.data);
 
                 if (showSaddles) {
-                    const saddlesData = await get(`/saddles?${boundsParams}`);
+                    const saddlesData = await axiosInstance.get(`/saddles?${boundsParams}`);
                     setSaddles(saddlesData.data.data);
                 }
             } else {
@@ -72,7 +72,7 @@ const MountainTrailsMap = () => {
     const [page, setPage] = useState<number>(1);
     const [totalDocuments, setTotalDocuments] = useState<number>(0);
     const mapRef = useRef<L.Map | null>(null);
-    
+
     useEffect(() => {
         setNick(getNickname());
     }, []);
@@ -92,8 +92,8 @@ const MountainTrailsMap = () => {
     useEffect(() => {
         const getFilteredData = async () => {
             if (debouncedSearchTerm) {
-                const filteredData = await get(`/peaks?search=${encodeURIComponent(debouncedSearchTerm)}&page=${page}`);
-                if(page === 1) {
+                const filteredData = await axiosInstance.get(`/peaks?search=${encodeURIComponent(debouncedSearchTerm)}&page=${page}`);
+                if (page === 1) {
                     setFilteredPeaks(filteredData.data.data);
                 } else {
                     setFilteredPeaks((prev) => [...prev, ...filteredData.data.data])
@@ -114,26 +114,32 @@ const MountainTrailsMap = () => {
 
     const highlightedIcon = new L.Icon.Default();
 
-    const handleSuggestionClick = (peak: Peak) => {  
-        setShowMenu(false);      
+    const handleSuggestionClick = (peak: Peak) => {
+        setShowMenu(false);
         const map = mapRef.current;
         if (map) {
-            map.flyTo([peak.lat, peak.lon], 15);
-            L.marker([peak.lat, peak.lon], {icon: highlightedIcon}).addTo(map);            
+            map.setView([peak.lat, peak.lon], 15);
+            L.marker([peak.lat, peak.lon], { icon: highlightedIcon }).addTo(map);
         }
         setSearchTerm(peak.tags.name);
         setFilteredPeaks([]);
     };
 
-    const handleAddPeak = async (peakId: string) => {               
+    const handleAddPeak = async (peakId: string) => {
         try {
-            await post(`/users/${nick}/peaks`, { peakId });
+            await axiosInstance.post(`/users/${nick}/peaks`, { peakId });
             toast.success('Dodano do zdobytych szczytów!');
         } catch (error: any) {
-            error.status === 400 ?
-                toast('Ten szczyt już jest zdobyty', { icon: <FontAwesomeIcon icon={faWarning} color='#ebc500' /> })
-                :
-                toast.error('Coś poszło nie tak');  
+            switch (error.status) {
+                case 400:
+                    toast('Ten szczyt już jest zdobyty', { icon: <FontAwesomeIcon icon={faWarning} color='#ebc500' /> });
+                    break;
+                case 401:
+                    toast.error('Błąd autoryzacji. Spróbuj się zalogować');
+                    break;
+                default:
+                    toast.error('Coś poszło nie tak');
+            }            
         }
     };
 
@@ -204,7 +210,7 @@ const MountainTrailsMap = () => {
                 }}
             >
                 <Offcanvas.Header closeButton>
-                    <Offcanvas.Title>Wyszukaj szczyt</Offcanvas.Title>                    
+                    <Offcanvas.Title>Wyszukaj szczyt</Offcanvas.Title>
                 </Offcanvas.Header>
                 <Offcanvas.Body>
                     <Form.Control

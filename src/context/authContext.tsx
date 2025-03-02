@@ -1,4 +1,4 @@
-import { post } from '@/utils/httpHelper';
+import axiosInstance from '@/utils/axiosInstance';
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 
 interface AuthContextType {
@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     useEffect(() => {
         const fetchNewAccessToken = async () => {
             try {
-                const response = await post('/users/refresh-token', {});
+                const response = await axiosInstance.post('/users/refresh-token');
                 setAccessToken(response.data.accessToken);
             } catch (error) {
                 console.error('Could not refresh token', error);
@@ -34,10 +34,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         window.location.reload();
     };
 
-    const logout = () => {
-        setAccessToken(null);
-        localStorage.removeItem('jwtToken');
-        post('/users/logout', {});
+    const logout = async () => {
+        try {
+            await axiosInstance.post('/users/logout');
+            setAccessToken(null);
+            localStorage.removeItem('jwtToken');
+        } catch (error) {
+            console.error(error)
+        }
         window.location.reload();
     };
 

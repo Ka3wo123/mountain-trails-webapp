@@ -30,7 +30,6 @@ const App = () => {
       <footer style={{ fontSize: '0.7rem', justifySelf: 'center' }}>
         Mountain trails &copy; version: {projectData.version} | <a href='/about'>About</a>
       </footer>
-
     </AuthProvider>
   );
 };

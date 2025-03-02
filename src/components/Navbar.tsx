@@ -5,10 +5,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChartSimple, faMap, faUser, faPersonHiking } from '@fortawesome/free-solid-svg-icons';
 import { useEffect, useState } from 'react';
 import Banner from '@/components/Banner';
-import { post } from '@/utils/httpHelper';
 import { toast, Toaster } from 'react-hot-toast';
 import { useAuth } from '@/context/authContext';
 import { getNickname } from '@/utils/jwtDecoder';
+import axiosInstance from '@/utils/axiosInstance';
 
 const Header = () => {
     const [nick, setNick] = useState<string | undefined>(undefined);
@@ -22,7 +22,7 @@ const Header = () => {
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const response = await post('/users/login', { nick, password });
+            const response = await axiosInstance.post('/users/login', { nick, password });
             const { token } = response.data;
             login(token);
         } catch (error: any) {
