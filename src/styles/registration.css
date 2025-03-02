@@ -1,79 +1,79 @@
 .register-form {
-    display: block;
-    justify-items: center;
-    background-color: #e4e4e4;
-    border-radius: 10%;
-    padding: 5%;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-    width: 100%;
-    max-width: 500px;
-    margin: 5%;
+  display: block;
+  justify-items: center;
+  background-color: #e4e4e4;
+  border-radius: 10%;
+  padding: 5%;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 500px;
+  margin: 5%;
 }
 
 .form-control {
-    border-radius: 10px;
-    border-color: #000000;
-    transition: box-shadow 0.3s;
+  border-radius: 10px;
+  border-color: #000000;
+  transition: box-shadow 0.3s;
 }
 
 .form-control:focus {
-    box-shadow: 0 0 10px rgba(10, 1, 19, 0.5);
+  box-shadow: 0 0 10px rgba(10, 1, 19, 0.5);
 }
 
 .form-header {
-    font-weight: bold;
-    color: #000000;
-    font-size: 1.75rem;
-    margin-bottom: 20px;
+  font-weight: bold;
+  color: #000000;
+  font-size: 1.75rem;
+  margin-bottom: 20px;
 }
 
 .submit-btn {
-    width: 100%;
-    padding: 12px;
-    font-size: 1.1rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+  width: 100%;
+  padding: 12px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .submit-btn:hover {
-    background-color: #d4d4d4;
+  background-color: #d4d4d4;
 }
 
 @media only screen and (max-width: 768px) {
-    .register-form {
-        padding: 20px;
-        margin-top: 10%;
-    }
+  .register-form {
+    padding: 20px;
+    margin-top: 10%;
+  }
 
-    .form-control {
-        font-size: 1.1rem;
-        padding: 12px;
-    }
+  .form-control {
+    font-size: 1.1rem;
+    padding: 12px;
+  }
 
-    .submit-btn {
-        font-size: 1.2rem;
-        padding: 14px;
-    }
+  .submit-btn {
+    font-size: 1.2rem;
+    padding: 14px;
+  }
 }
 
 @media only screen and (max-width: 480px) {
-    .register-form {
-        padding: 15px;
-        margin-top: 15%;
-    }
+  .register-form {
+    padding: 15px;
+    margin-top: 15%;
+  }
 
-    .form-control {
-        font-size: 1rem;
-        padding: 10px;
-    }
+  .form-control {
+    font-size: 1rem;
+    padding: 10px;
+  }
 
-    .form-header {
-        font-size: 1.5rem;
-        margin-bottom: 15px;
-    }
+  .form-header {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+  }
 
-    .submit-btn {
-        font-size: 1rem;
-        padding: 12px;
-    }
+  .submit-btn {
+    font-size: 1rem;
+    padding: 12px;
+  }
 }

@@ -1,12 +1,11 @@
 .banner {
-    width: 100vw;
-    display: flex;
-    justify-content: center;
-    align-items: center;    
-  }
-  
-  .logo {
-    width: 100vw;  
-    margin-top: 25px;      
-  }
-  
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo {
+  width: 100vw;
+  margin-top: 25px;
+}

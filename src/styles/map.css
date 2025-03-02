@@ -1,9 +1,8 @@
-.list-item {    
-    transition: 0.5s;    
-
+.list-item {
+  transition: 0.5s;
 }
 
 .list-item:hover {
-    background-color: rgb(194, 194, 194);
-    cursor: pointer;
+  background-color: rgb(194, 194, 194);
+  cursor: pointer;
 }

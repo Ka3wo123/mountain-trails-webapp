@@ -3,7 +3,7 @@ import { Button, Form } from 'react-bootstrap';
 import { toast, Toaster } from 'react-hot-toast';
 import '@/styles/registration.css';
 import axiosInstance from '@/utils/axiosInstance';
-
+import { API_ENDPOINTS, ERROR_MESSAGES, HTTP_STATUS, SUCCESS_MESSAGES } from '@/constants';
 
 const Register = () => {
   const [name, setName] = useState<string>('');
@@ -14,31 +14,29 @@ const Register = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await axiosInstance.post('/users/register', {
+      await axiosInstance.post(API_ENDPOINTS.USERS.REGISTER, {
         name,
         surname,
         nick,
         password,
       });
-      toast.success(`Utworzono nowe konto dla ${nick}`);
+      toast.success(SUCCESS_MESSAGES.ACCOUNT_CREATED(nick));
       setName('');
       setSurname('');
       setNick('');
       setPassword('');
     } catch (error: any) {
-      error.status === 400 ?
-        toast.error('Nickname już istnieje')
-        :
-        toast.error('Coś poszło nie tak');
-
+      error.status === HTTP_STATUS.BAD_REQUEST
+        ? toast.error(ERROR_MESSAGES.NICKNAME_EXISTS)
+        : toast.error(ERROR_MESSAGES.SERVER_ERROR);
     }
   };
 
   return (
     <div style={{ display: 'flex', justifyContent: 'center' }}>
-      <div className='register-form'>
+      <div className="register-form">
         <h2 className="form-header">Rejestracja do systemu</h2>
-        <Form onSubmit={handleSubmit} className='form-controll'>
+        <Form onSubmit={handleSubmit} className="form-controll">
           <Form.Group controlId="name" className="mb-3">
             <Form.Label>Imię</Form.Label>
             <Form.Control
@@ -75,18 +73,13 @@ const Register = () => {
               required
             />
           </Form.Group>
-          <Button
-            variant="primary"
-            type="submit"
-            className='submit-btn'
-          >
+          <Button variant="primary" type="submit" className="submit-btn">
             Utwórz konto
           </Button>
         </Form>
-        <Toaster position='top-right' toastOptions={{ duration: 3000 }} />
+        <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
       </div>
     </div>
-
   );
 };
 export default Register;

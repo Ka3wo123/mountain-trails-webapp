@@ -6,46 +6,51 @@ import toast from 'react-hot-toast';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { ListGroup } from 'react-bootstrap';
 import axiosInstance from '@/utils/axiosInstance';
+import { API_ENDPOINTS, ERROR_MESSAGES, ROUTES } from '@/constants';
 
 const Statistics = () => {
-    const [users, setUsers] = useState<User[]>([]);
-    const [totalPeaks, setTotalPeaks] = useState<number>(0);
-    const [loading, setLoading] = useState<boolean>(true);
+  const [users, setUsers] = useState<User[]>([]);
+  const [totalPeaks, setTotalPeaks] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(true);
 
-    useEffect(() => {
-        const fetchUsers = async () => {
-            try {
-                const response = await axiosInstance.get('/users');
-                const peaksResponse = await axiosInstance.get('/peaks/count');
-                setUsers(response.data.data);
-                setTotalPeaks(peaksResponse.data.total);
-                setLoading(false);
-            } catch (error: any) {
-                setLoading(false);
-                toast.error('Coś poszło nie tak' + error);
-            }
-        };
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await axiosInstance.get(API_ENDPOINTS.USERS.BASE);
+        const peaksResponse = await axiosInstance.get(API_ENDPOINTS.PEAKS.COUNT);
+        setUsers(response.data.data);
+        setTotalPeaks(peaksResponse.data.total);
+        setLoading(false);
+      } catch (error: any) {
+        setLoading(false);
+        toast.error(ERROR_MESSAGES.SERVER_ERROR);
+      }
+    };
 
-        fetchUsers();
-    }, []);
+    fetchUsers();
+  }, []);
 
-    return (
-        <div>
-            <h1>Statystyki użytkowników</h1>
-            <ListGroup className='peaks-list'>
-                {users.map((user) => (
-                    <ListGroup.Item key={user.nick} className="user-info">
-                        <h2>
-                            <Link to={`/${user.nick}/profile`}>{user.nick} ({user.name} {user.surname})</Link>
-                        </h2>
-                        {(user.peaksAchieved.length / totalPeaks * 100).toFixed(4)}%
-                        <progress value={parseFloat((user.peaksAchieved.length / totalPeaks).toFixed(6))}></progress>
-                    </ListGroup.Item>
-                ))}
-            </ListGroup>
-            {loading && <LoadingSpinner label='Ładowanie statystyk' />}
-        </div>
-    );
+  return (
+    <div>
+      <h1>Statystyki użytkowników</h1>
+      <ListGroup className="peaks-list">
+        {users.map((user) => (
+          <ListGroup.Item key={user.nick} className="user-info">
+            <h2>
+              <Link to={ROUTES.USER_PROFILE_PARAM(user.nick)}>
+                {user.nick} ({user.name} {user.surname})
+              </Link>
+            </h2>
+            {((user.peaksAchieved.length / totalPeaks) * 100).toFixed(4)}%
+            <progress
+              value={parseFloat((user.peaksAchieved.length / totalPeaks).toFixed(6))}
+            ></progress>
+          </ListGroup.Item>
+        ))}
+      </ListGroup>
+      {loading && <LoadingSpinner label="Ładowanie statystyk" />}
+    </div>
+  );
 };
 
 export default Statistics;

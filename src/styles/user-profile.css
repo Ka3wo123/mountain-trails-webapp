@@ -1,195 +1,194 @@
 .user-profile {
-    padding: 20px;
-    max-width: 800px;
-    margin: 0 auto;
-    font-family: Arial, sans-serif;
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+  font-family: Arial, sans-serif;
 }
 
 h1 {
-    font-size: 2rem;
-    text-align: center;
-    margin-bottom: 20px;
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 20px;
 }
 
 h3 {
-    font-size: 1.5rem;
-    margin-bottom: 15px;
-    text-align: center;
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+  text-align: center;
 }
 
 .list-group {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 
 .list-group-item {
-    background-color: #f8f9fa;
-    border: 1px solid #e9ecef;
-    padding: 10px 15px;
-    margin-bottom: 8px;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  padding: 10px 15px;
+  margin-bottom: 8px;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
 }
 
 .list-group-item:hover {
-    background-color: #e2e6ea;
+  background-color: #e2e6ea;
 }
 
 .list-group-item .fa-mountain {
-    margin-right: 8px;
-    color: #007bff;
+  margin-right: 8px;
+  color: #007bff;
 }
 
 .pagination span {
-    font-size: 1.2rem;
+  font-size: 1.2rem;
 }
 
 .loading-spinner {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
 }
 
 .expandable-item {
-    cursor: pointer;
-    padding: 10px;
-    border-bottom: 1px solid #ccc;
-    transition: background-color 0.2s ease;
+  cursor: pointer;
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+  transition: background-color 0.2s ease;
 }
 
 .expandable-item:hover {
-    background-color: #f9f9f9;
+  background-color: #f9f9f9;
 }
 
 .item-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .chevron {
-    margin-left: auto;
-    padding: 1%;
-    border-radius: 10px;
-    transition: 0.5s;
+  margin-left: auto;
+  padding: 1%;
+  border-radius: 10px;
+  transition: 0.5s;
 }
 
 .chevron:hover {
-    background-color: #ccc;
+  background-color: #ccc;
 }
 
 .item-details {
-    display: flex;
-    flex-direction: column;
-    margin-top: 8px;
-    padding: 15px;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  margin-top: 8px;
+  padding: 15px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-
-.item-details input[type="file"] {
-    margin-top: 10px;
-    padding: 8px;
-    font-size: 1rem;
-    max-width: 50%;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #e0e0e0;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+.item-details input[type='file'] {
+  margin-top: 10px;
+  padding: 8px;
+  font-size: 1rem;
+  max-width: 50%;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #e0e0e0;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .item-details button {
-    margin-top: 10px;
-    padding: 8px 16px;
-    border: none;
-    cursor: pointer;
+  margin-top: 10px;
+  padding: 8px 16px;
+  border: none;
+  cursor: pointer;
 }
 
 .peak-image {
-    width: 20%;
-    margin: 10px;
-    height: auto;
-    border-radius: 8px;
-    box-shadow: 5px 5px 4px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s ease;
+  width: 20%;
+  margin: 10px;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 5px 5px 4px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease;
 }
 
 .peak-image:hover {
-    transform: scale(105%) !important;
+  transform: scale(105%) !important;
 }
 
 .peak-gallery-image {
-    width: 100%;
-    height: auto;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
 }
 
 .pagination button {
-    color: white;
-    border: none;
-    border-radius: 4px;
-    border-radius: 10%;
-    cursor: pointer;
-    transition: background-color 0.2s;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  border-radius: 10%;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
 
 .pagination button:hover {
-    background-color: #0056b3;
+  background-color: #0056b3;
 }
 
 .pagination span {
-    font-size: 1em;
-    color: #000000;
+  font-size: 1em;
+  color: #000000;
 }
 
 .carousel-caption h5 {
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    font-size: 18px;
-    background: rgba(0, 0, 0, 0.4);
-    padding: 5px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  font-size: 18px;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 5px;
 }
 
 .image-options {
-    display: flex;
-    position: inherit;
-    z-index: 2;
+  display: flex;
+  position: inherit;
+  z-index: 2;
 }
 
 .peak-images-container {
-    display: flex;
-    align-items: baseline;
-    justify-content: flex-start;
-    margin-left: 10%;        
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-start;
+  margin-left: 10%;
 }
 
 .peak-image:nth-child(1) {
-    transform: rotate(-10deg) translateX(-20px);
-    z-index: 1; 
+  transform: rotate(-10deg) translateX(-20px);
+  z-index: 1;
 }
 
 .peak-image:nth-child(2) {
-    transform: rotate(0deg);
-    z-index: 2;
-    position: relative;
-    left: -100px; 
+  transform: rotate(0deg);
+  z-index: 2;
+  position: relative;
+  left: -100px;
 }
 
 .peak-image:nth-child(3) {
-    transform: rotate(10deg) translateX(20px);
-    z-index: 3;
-    position: relative;
-    left: -200px;
+  transform: rotate(10deg) translateX(20px);
+  z-index: 3;
+  position: relative;
+  left: -200px;
 }
