@@ -27,7 +27,7 @@ axiosInstance.interceptors.response.use(
         if (response.status === 401 && !config._retry) {
             config._retry = true;
             try {
-                const refreshResponse = await axios.post(`/users/refresh-token`, {}, { withCredentials: true });
+                const refreshResponse = await axios.post(`/api/users/refresh-token`, {}, { withCredentials: true });
                 const newAccessToken = refreshResponse.data.accessToken;
 
                 localStorage.setItem('jwtToken', newAccessToken);
