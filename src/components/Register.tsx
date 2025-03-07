@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Form } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
 import { toast, Toaster } from 'react-hot-toast';
 import '@/styles/registration.css';
 import axiosInstance from '@/utils/axiosInstance';
@@ -73,9 +73,9 @@ const Register = () => {
               required
             />
           </Form.Group>
-          <Button variant="primary" type="submit" className="submit-btn">
+          <button type="submit" className="success">
             Utwórz konto
-          </Button>
+          </button>
         </Form>
         <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
       </div>

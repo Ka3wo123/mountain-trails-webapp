@@ -6,8 +6,6 @@ import { PeakDto } from '@/models/PeakDto';
 import '@/styles/user-profile.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faArrowLeft,
-  faArrowRight,
   faMountain,
   faChevronDown,
   faChevronUp,
@@ -15,10 +13,18 @@ import {
   faTrash,
 } from '@fortawesome/free-solid-svg-icons';
 import LoadingSpinner from '@/components/LoadingSpinner';
-import { ListGroup, Collapse, Button, Modal, Carousel, Dropdown } from 'react-bootstrap';
+import {
+  ListGroup,
+  Collapse,
+  Button,
+  Modal,
+  Carousel,
+  Dropdown,
+  ProgressBar,
+} from 'react-bootstrap';
 import toast, { Toaster } from 'react-hot-toast';
 import axiosInstance from '@/utils/axiosInstance';
-import {  
+import {
   ALERT_MESSAGES,
   API_ENDPOINTS,
   ERROR_MESSAGES,
@@ -26,6 +32,7 @@ import {
   SUCCESS_MESSAGES,
 } from '@/constants';
 import { useAuth } from '@/context/authContext';
+import CustomPagination from './Pagination';
 
 const UserProfile = () => {
   const { nick } = useParams<{ nick: string }>();
@@ -45,19 +52,20 @@ const UserProfile = () => {
   const [selectedPeakId, setSelectedPeakId] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
-  const limit = 10;
+  const PEAKS_LIMIT = 10;
+  const SCALE = 19;
   const cloudinaryFolderName = import.meta.env.VITE_CLOUDINARY_FOLDER_NAME;
   const { isAuthenticated } = useAuth();
 
   const fetchUserProfile = async () => {
     try {
       await axiosInstance.get(API_ENDPOINTS.USERS.ONE(nick!)).then((response) => {
-        setUser(response.data.data);
+        setUser(response.data);
 
         const imagesData: {
           [peakId: string]: { url: string; publicId: string }[];
         } = {};
-        response.data.data.peaksAchieved.forEach((peak: any) => {
+        response.data.peaksAchieved.forEach((peak: any) => {
           const peakImages = peak.imgData || [];
           imagesData[peak.peakId] = peakImages;
         });
@@ -71,9 +79,9 @@ const UserProfile = () => {
   const fetchUserPeaks = async () => {
     try {
       const peaksResponse = await axiosInstance.get(API_ENDPOINTS.USERS.PEAK_FOR(nick!), {
-        params: { page, limit },
+        params: { page, limit: PEAKS_LIMIT },
       });
-      setPeaks(peaksResponse.data.data);
+      setPeaks(peaksResponse.data.peakDtos);
       setTotalPages(peaksResponse.data.totalPages);
       setTotalSystemPeaks(peaksResponse.data.totalSystemPeaks);
     } catch (error) {
@@ -83,9 +91,7 @@ const UserProfile = () => {
     }
   };
 
-  useEffect(() => {
-    
-  }, [nick]);
+  useEffect(() => {}, [nick]);
 
   useEffect(() => {
     fetchUserPeaks();
@@ -172,9 +178,8 @@ const UserProfile = () => {
       }));
 
       toast.success(SUCCESS_MESSAGES.PHOTO_DELETED);
-      setShowModal(false);      
+      setShowModal(false);
       await fetchUserProfile();
-
     } catch (error) {
       console.error('Error deleting image:', error);
     } finally {
@@ -210,7 +215,12 @@ const UserProfile = () => {
         <p>
           <strong>Zdobyte szczyty:</strong> {user?.peaksAchieved?.length ?? 0} / {totalSystemPeaks}
         </p>
-        <progress value={(user?.peaksAchieved?.length ?? 0) / totalSystemPeaks}></progress>
+        <ProgressBar
+          variant={'success'}
+          now={user?.peaksAchieved?.length ?? 0}
+          animated
+          max={totalSystemPeaks}
+        />
       </div>
 
       <h3>Lista zdobytych szczytów</h3>
@@ -257,18 +267,49 @@ const UserProfile = () => {
                             }}
                           />
                           {selectedFile && (
-                            <Button onClick={() => handleUpload(openPeakId!)}>Prześlij</Button>
+                            <Button className="success" onClick={() => handleUpload(openPeakId!)}>
+                              Prześlij
+                            </Button>
                           )}
                         </>
                       ) : (
                         <p>Zaloguj się, aby dodać zdjęcia.</p>
                       )}
                       <hr />
-                      <div className="settings">
-                        <Button
-                          variant="outline-danger"
-                          onClick={() => handleDeletePeak(peak.peakId)}
+                      <a
+                        href={`https://mapa-turystyczna.pl/#${peak.lat}/${peak.lon}/${SCALE}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Zobacz na mapie turystycznej
+                      </a>
+                      <div
+                        style={{
+                          maxWidth: '100%',
+                          overflow: 'hidden',
+                          margin: '0 auto',
+                          minWidth: '300px',
+                        }}
+                      >
+                        <iframe
+                          src="https://mapa-turystyczna.pl/map/widget/route/h1l0p0/3calt.html"
+                          height="680"
+                          style={{ width: '100%', border: 0 }}
+                          loading="lazy"
+                          title="Tourist Map"
+                        ></iframe>
+                        <a
+                          href="https://mapa-turystyczna.pl/route/3calt?utm_source=external_web&utm_medium=widget&utm_campaign=route_widget"
+                          target="_blank"
+                          rel="noopener noreferrer"
                         >
+                          Trasa: Brzesko – Rozejście szlaków | mapa-turystyczna.pl
+                        </a>
+                      </div>
+
+                      <hr />
+                      <div className="settings">
+                        <Button className="danger" onClick={() => handleDeletePeak(peak.peakId)}>
                           Usuń ze zdobytych
                         </Button>
                       </div>
@@ -278,18 +319,11 @@ const UserProfile = () => {
               </ListGroup.Item>
             ))}
           </ListGroup>
-
-          <div className="pagination">
-            <Button onClick={() => handlePageChange(page - 1)} disabled={page === 1}>
-              <FontAwesomeIcon icon={faArrowLeft} />
-            </Button>
-            <span>
-              {page} z {totalPages}
-            </span>
-            <Button onClick={() => handlePageChange(page + 1)} disabled={page === totalPages}>
-              <FontAwesomeIcon icon={faArrowRight} />
-            </Button>
-          </div>
+          <CustomPagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
         </div>
       ) : (
         <p>Brak zdobytych szczytów.</p>

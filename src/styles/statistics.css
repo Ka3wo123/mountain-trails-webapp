@@ -1,18 +1,15 @@
 .user-info {
   background-color: #f9f9f9;
   border: 1px solid #e0e0e0;
-  padding: 20px;
   margin: 5%;
   border-radius: 12px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s;
 }
 
-h1 {
-  text-align: center;
-  font-size: 2.5rem;
-  margin-top: 5%;
-  color: #333;
+.stats-text {
+  font-size: clamp(1.5rem, 5vw, 3rem);
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
 }
 
 .peaks-list li {
@@ -40,15 +37,25 @@ h1 {
 progress {
   width: 100%;
   max-height: auto;
-  border-radius: 5%;
+  border-radius: 1%;
+}
+
+.stats-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background-color: #d8d8d8;
+  height: 5rem;
+  padding: clamp(1rem, 2vw, 2rem);
+  border-bottom-left-radius: 20rem;
+  border-bottom-right-radius: 20rem;
 }
 
 progress::-webkit-progress-bar {
   background-color: #858585;
-  border-radius: 5px;
 }
 
 progress::-webkit-progress-value {
-  background: linear-gradient(90deg, rgb(140, 0, 255), blue);
-  border-radius: 5px;
+  background: linear-gradient(90deg, rgb(18, 70, 5) 20%, rgb(131, 0, 238) 90%);
 }

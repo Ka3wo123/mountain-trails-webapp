@@ -13,6 +13,7 @@ export const API_ENDPOINTS = {
   },
   USERS: {
     BASE: '/users',
+    PAGINATION: (page: number, limit?: number) => `/users?page=${page}&limit=${limit}`,
     ONE: (nick: string) => `/users/${nick}`,
     PEAK_FOR: (nick: string) => `/users/${nick}/peaks`,
     LOGIN: '/users/login',
@@ -50,12 +51,15 @@ export const SUCCESS_MESSAGES = {
   PHOTO_DELETED: 'Zdjęcie zostało usunięte',
 };
 export const ALERT_MESSAGES = {
-  PEAK_DELETE: 'Czy na pewno chcesz usunąć ten szczyt ze zdobytych?'
-}
+  PEAK_DELETE: 'Czy na pewno chcesz usunąć ten szczyt ze zdobytych?',
+};
 export const HTTP_STATUS = {
   OK: 200,
   BAD_REQUEST: 400,
   UNAUTHORIZED: 401,
   FORBIDDEN: 403,
   NOT_FOUND: 404,
+  CONFLICT: 409,
+  CONTENT_TOO_LARGE: 413,
+  UNSUPPORTED_FILE_FORMAT: 415,
 };

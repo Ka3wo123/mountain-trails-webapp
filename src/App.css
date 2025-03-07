@@ -5,12 +5,34 @@ body {
 }
 
 button {
-  background: linear-gradient(135deg, #6a11cb, #2575fc);
-  color: white;
-  font-size: 1.1rem;
-  padding: 12px;
+  font-size: 1.1rem !important;
+  padding: 0.5rem 1rem !important;
+  border: none !important;
+  border-radius: 2rem !important;
+  cursor: pointer;
+  transition: all 0.3s ease !important;
+  text-transform: uppercase;
 }
 
 button:hover {
-  background: linear-gradient(135deg, #2575fc, #6a11cb);
+  filter: brightness(105%);
+}
+button.primary {
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  color: white;
+}
+
+button.danger {
+  background: linear-gradient(135deg, #ff4e50, #d91c28);
+  color: white;
+}
+
+button.warning {
+  background: linear-gradient(135deg, #f39c12, #f1c40f);
+  color: white;
+}
+
+button.success {
+  background: linear-gradient(135deg, #4abe65, #0a7521);
+  color: white;
 }

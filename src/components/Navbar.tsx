@@ -1,6 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Link, Outlet } from 'react-router-dom';
-import { Navbar, Nav, Container, Dropdown, Form, Button } from 'react-bootstrap';
+import { Navbar, Nav, Container, Dropdown, Form } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChartSimple, faMap, faUser, faPersonHiking } from '@fortawesome/free-solid-svg-icons';
 import { useEffect, useState } from 'react';
@@ -10,6 +10,7 @@ import { useAuth } from '@/context/authContext';
 import { getNickname } from '@/utils/jwtDecoder';
 import axiosInstance from '@/utils/axiosInstance';
 import { API_ENDPOINTS, ERROR_MESSAGES, HTTP_STATUS } from '@/constants';
+import '@/styles/navbar.css';
 
 const Header = () => {
   const [nick, setNick] = useState<string | undefined>(undefined);
@@ -46,15 +47,15 @@ const Header = () => {
   return (
     <>
       <Banner />
-      <Navbar sticky="top" expand="lg" bg="dark" variant="dark" className="shadow-lg px-3">
+      <Navbar expand="lg" bg="dark" variant="dark" className="navbar">
         <Container>
           <Navbar.Brand as={Link} to="/">
-            <FontAwesomeIcon icon={faPersonHiking} className="me-2" />
+            <FontAwesomeIcon icon={faPersonHiking} className="nav-logo" />
             Mountain Trails
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="ms-auto">
+            <Nav className="nav-links">
               <Nav.Link as={Link} to="/">
                 <FontAwesomeIcon icon={faMap} className="me-1" />
                 Mapa
@@ -72,46 +73,46 @@ const Header = () => {
               <Dropdown.Toggle variant="secondary">
                 {isAuthenticated ? 'Profil' : 'Zaloguj się'}
               </Dropdown.Toggle>
-              <Dropdown.Menu variant={'dark'} style={{ width: '300px' }}>
+              <Dropdown.Menu className="dropdown-menu">
                 {!isAuthenticated ? (
-                  <div className="p-3">
-                    <Form onSubmit={handleLogin} className="w-100">
-                      <div className="row">
-                        <div className="col-12">
-                          <Form.Group controlId="nickname" className="mb-3">
-                            <Form.Label>Nickname</Form.Label>
-                            <Form.Control
-                              type="text"
-                              value={nick}
-                              onChange={(e) => setNick(e.target.value)}
-                              required
-                            />
-                          </Form.Group>
-                          <Form.Group controlId="password" className="mb-3">
-                            <Form.Label>Hasło</Form.Label>
-                            <Form.Control
-                              type="password"
-                              value={password}
-                              onChange={(e) => setPassword(e.target.value)}
-                              required
-                            />
-                          </Form.Group>
-                          <Button variant="primary" type="submit" className="w-100">
-                            Zaloguj się
-                          </Button>
-                        </div>
+                  <Form onSubmit={handleLogin} className="w-100">
+                    <div>
+                      <div>
+                        <Form.Group controlId="nickname" className="mb-3">
+                          <Form.Label>Nickname</Form.Label>
+                          <Form.Control
+                            type="text"
+                            value={nick}
+                            onChange={(e) => setNick(e.target.value)}
+                            required
+                          />
+                        </Form.Group>
+                        <Form.Group controlId="password" className="mb-3">
+                          <Form.Label>Hasło</Form.Label>
+                          <Form.Control
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                          />
+                        </Form.Group>
+                        <button className="success" type="submit">
+                          Zaloguj się
+                        </button>
                       </div>
-                    </Form>
-                  </div>
+                    </div>
+                  </Form>
                 ) : (
-                  <div className="p-3 text-center">
-                    <p>Witaj, {nick}!</p>
-                    <Link to={`${nick}/profile`} className="w-100 mb-2">
-                      Przejdź do profilu
-                    </Link>
-                    <Button variant="outline-danger" onClick={logout} className="w-100">
-                      Wyloguj się
-                    </Button>
+                  <div>
+                    <p>Witaj {nick}!</p>
+                    <div className="logged">
+                      <Link to={`${nick}/profile`} className="profile-link">
+                        Przejdź do profilu
+                      </Link>
+                      <button onClick={logout} className="danger">
+                        Wyloguj się
+                      </button>
+                    </div>
                   </div>
                 )}
               </Dropdown.Menu>

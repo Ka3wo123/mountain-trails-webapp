@@ -6,9 +6,9 @@ import { Saddle } from '@/models/Saddle';
 import { Icon } from 'leaflet';
 import peakMarker from '@/assets/mountain-marker.png';
 import saddleMarker from '@/assets/saddle-marker.png';
-import { Button, Offcanvas, Form, ListGroup } from 'react-bootstrap';
+import { Button, Offcanvas, Form, ListGroup, InputGroup } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faWarning } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faWarning, faX } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from '@/context/authContext';
 import { toast, Toaster } from 'react-hot-toast';
 import { getNickname } from '@/utils/jwtDecoder';
@@ -37,15 +37,14 @@ const MapUpdater = ({
       const boundsParams = `lat1=${bounds.getSouthWest().lat}&lon1=${bounds.getSouthWest().lng}&lat2=${bounds.getNorthEast().lat}&lon2=${bounds.getNorthEast().lng}`;
 
       if (map.getZoom() >= MAX_ZOOM) {
-        const peaksData = await axiosInstance.get(API_ENDPOINTS.PEAKS.WITH_BOUNDS(boundsParams));
-
-        setPeaks(peaksData.data.data);
+        await axiosInstance.get(API_ENDPOINTS.PEAKS.WITH_BOUNDS(boundsParams)).then((response) => {
+          setPeaks(response.data.data);
+        });
 
         if (showSaddles) {
-          const saddlesData = await axiosInstance.get(
-            API_ENDPOINTS.SADDLES.WITH_BOUNDS(boundsParams)
-          );
-          setSaddles(saddlesData.data.data);
+          await axiosInstance
+            .get(API_ENDPOINTS.SADDLES.WITH_BOUNDS(boundsParams))
+            .then((response) => setSaddles(response.data));
         }
       } else {
         setPeaks([]);
@@ -76,11 +75,8 @@ const MountainTrailsMap = () => {
   const [page, setPage] = useState<number>(1);
   const [totalDocuments, setTotalDocuments] = useState<number>(0);
   const mapRef = useRef<L.Map | null>(null);
-
-  useEffect(() => {
-    setNick(getNickname());
-  }, []);
-
+  const [selectedPeak, setSelectedPeak] = useState<Peak | null>(null);
+  const markerRefs = useRef<{ [key: string]: L.Marker | null }>({});
   const peakIcon = new Icon({
     iconUrl: peakMarker,
     iconSize: [30, 30],
@@ -92,6 +88,21 @@ const MountainTrailsMap = () => {
   });
 
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
+  useEffect(() => {
+    setNick(getNickname());
+  }, []);
+
+  useEffect(() => {
+  if (selectedPeak) {
+    setTimeout(() => {
+      const marker = markerRefs.current[selectedPeak.id];
+      if (marker) {
+        marker.openPopup();
+      }
+    }, 100);
+  }
+}, [selectedPeak]);
 
   useEffect(() => {
     const getFilteredData = async () => {
@@ -118,14 +129,12 @@ const MountainTrailsMap = () => {
     setPage(1);
   };
 
-  const highlightedIcon = new L.Icon.Default();
-
   const handleSuggestionClick = (peak: Peak) => {
     setShowMenu(false);
+    setSelectedPeak(peak);
     const map = mapRef.current;
     if (map) {
       map.setView([peak.lat, peak.lon], 15);
-      L.marker([peak.lat, peak.lon], { icon: highlightedIcon }).addTo(map);
     }
     setSearchTerm(peak.tags.name);
     setFilteredPeaks([]);
@@ -139,7 +148,7 @@ const MountainTrailsMap = () => {
       }
     } catch (error: any) {
       switch (error.status) {
-        case HTTP_STATUS.BAD_REQUEST:
+        case HTTP_STATUS.CONFLICT:
           toast(ERROR_MESSAGES.PEAK_ACHIEVED, {
             icon: <FontAwesomeIcon icon={faWarning} color="#ebc500" />,
           });
@@ -157,6 +166,10 @@ const MountainTrailsMap = () => {
     setPage(page + 1);
   };
 
+  function handleClear() {
+    setSearchTerm('');
+  }
+
   return (
     <div style={{ display: 'flex', height: '100vh', justifyContent: 'center' }}>
       <MapContainer
@@ -173,18 +186,27 @@ const MountainTrailsMap = () => {
 
         {peaks &&
           peaks.map((peak) => (
-            <Marker key={peak.id} position={[peak.lat, peak.lon]} icon={peakIcon}>
+            <Marker
+              key={peak.id}
+              position={[peak.lat, peak.lon]}
+              icon={peakIcon}
+              ref={(e) => {
+                 markerRefs.current[peak.id] = e;
+              }}
+            >
               <Popup>
                 <b>{peak.tags.name}</b>
                 <br />
                 Wysokość: {peak.tags.ele} m n.p.m.
                 <br />
                 <small>
-                  Koordynaty: {peak.lat.toFixed(5)}, {peak.lon.toFixed(5)}
+                  {peak.lat.toFixed(5)}, {peak.lon.toFixed(5)}
                 </small>
                 {isAuthenticated && (
                   <div className="mt-2 sm">
-                    <Button onClick={() => handleAddPeak(peak._id)}>Dodaj do zdobytych</Button>
+                    <Button className="success" onClick={() => handleAddPeak(peak._id)}>
+                      Dodaj do zdobytych
+                    </Button>
                   </div>
                 )}
               </Popup>
@@ -208,7 +230,7 @@ const MountainTrailsMap = () => {
           position: 'relative',
           right: 20,
           top: 20,
-          zIndex: 1000,
+          zIndex: 500,
           borderRadius: '50%',
           width: '40px',
           height: '40px',
@@ -237,13 +259,19 @@ const MountainTrailsMap = () => {
           <Offcanvas.Title>Wyszukaj szczyt</Offcanvas.Title>
         </Offcanvas.Header>
         <Offcanvas.Body>
-          <Form.Control
-            type="text"
-            placeholder="Wpisz nazwę szczytu"
-            value={searchTerm}
-            onChange={handleSearchChange}
-            className="mb-3"
-          />
+          <InputGroup className="mb-3">
+            <Form.Control
+              type="text"
+              placeholder="Wpisz nazwę szczytu"
+              value={searchTerm}
+              onChange={handleSearchChange}
+            />
+            {searchTerm && (
+              <Button className="danger ms-1" onClick={handleClear}>
+                <FontAwesomeIcon icon={faX} />
+              </Button>
+            )}
+          </InputGroup>
 
           {filteredPeaks.length > 0 && (
             <ListGroup>
