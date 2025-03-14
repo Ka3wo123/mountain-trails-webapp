@@ -1,6 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { User } from '@/models/User';
 import { PeakDto } from '@/models/PeakDto';
 import '@/styles/user-profile.css';
