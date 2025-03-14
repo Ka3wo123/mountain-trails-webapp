@@ -32,14 +32,12 @@ import {
   SUCCESS_MESSAGES,
 } from '@/constants';
 import { useAuth } from '@/context/authContext';
-import CustomPagination from './Pagination';
 
 const UserProfile = () => {
   const { nick } = useParams<{ nick: string }>();
   const [user, setUser] = useState<User | null>(null);
   const [peaks, setPeaks] = useState<PeakDto[]>([]);
-  const [page, setPage] = useState<number>(1);
-  const [totalPages, setTotalPages] = useState<number>(1);
+  const [nextCursor, setNextCursor] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(true);
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
@@ -76,13 +74,14 @@ const UserProfile = () => {
     }
   };
 
-  const fetchUserPeaks = async () => {
+  const fetchUserPeaks = async (cursor: string = '') => {
     try {
+      setLoading(true);
       const peaksResponse = await axiosInstance.get(API_ENDPOINTS.USERS.PEAK_FOR(nick!), {
-        params: { page, limit: PEAKS_LIMIT },
+        params: { next: cursor, limit: PEAKS_LIMIT },
       });
-      setPeaks(peaksResponse.data.peakDtos);
-      setTotalPages(peaksResponse.data.totalPages);
+      setNextCursor(peaksResponse.data.nextCursor);
+      setPeaks((prevPeaks) => [...prevPeaks, ...peaksResponse.data.peakDtos]);
       setTotalSystemPeaks(peaksResponse.data.totalSystemPeaks);
     } catch (error) {
       console.error('Error fetching user peaks:', error);
@@ -96,10 +95,20 @@ const UserProfile = () => {
   useEffect(() => {
     fetchUserPeaks();
     fetchUserProfile();
-  }, [page, nick]);
+  }, [nick]);
 
-  const handlePageChange = (newPage: number) => {
-    setPage(newPage);
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [nextCursor, loading]);
+
+  const handleScroll = () => {
+    const bottom =
+      window.innerHeight + document.documentElement.scrollTop ===
+      document.documentElement.offsetHeight;
+    if (bottom && nextCursor && !loading) {
+      fetchUserPeaks(nextCursor);
+    }
   };
 
   const togglePeak = (peakId: string) => {
@@ -148,8 +157,14 @@ const UserProfile = () => {
       toast.success(SUCCESS_MESSAGES.PHOTO_UPLOADED);
     } catch (error: any) {
       switch (error.status) {
-        case HTTP_STATUS.BAD_REQUEST:
-          toast.error(ERROR_MESSAGES.FILE_OVERSIZE);
+        case HTTP_STATUS.CONTENT_TOO_LARGE:
+          toast.error(error.maxSize);
+          break;
+        case HTTP_STATUS.UNSUPPORTED_FILE_FORMAT:
+          toast.error(ERROR_MESSAGES.UNSUPPROTED_FILE_FORMAT(error.response.data.allowedFormats));
+          break;
+        default:
+          toast.error(ERROR_MESSAGES.SERVER_ERROR);
       }
     } finally {
       setIsUploading(false);
@@ -309,9 +324,11 @@ const UserProfile = () => {
 
                       <hr />
                       <div className="settings">
-                        <Button className="danger" onClick={() => handleDeletePeak(peak.peakId)}>
-                          Usuń ze zdobytych
-                        </Button>
+                        {isAuthenticated && (
+                          <Button className="danger" onClick={() => handleDeletePeak(peak.peakId)}>
+                            Usuń ze zdobytych
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -319,11 +336,6 @@ const UserProfile = () => {
               </ListGroup.Item>
             ))}
           </ListGroup>
-          <CustomPagination
-            currentPage={page}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-          />
         </div>
       ) : (
         <p>Brak zdobytych szczytów.</p>

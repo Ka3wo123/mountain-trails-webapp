@@ -93,16 +93,12 @@ const MountainTrailsMap = () => {
     setNick(getNickname());
   }, []);
 
-  useEffect(() => {
-  if (selectedPeak) {
-    setTimeout(() => {
-      const marker = markerRefs.current[selectedPeak.id];
-      if (marker) {
-        marker.openPopup();
-      }
-    }, 100);
-  }
-}, [selectedPeak]);
+  // useEffect(() => {
+  //   if (selectedPeak) {
+  //     const marker = markerRefs.current[selectedPeak.id];
+  //     marker?.openPopup();
+  //   }
+  // }, [selectedPeak]);
 
   useEffect(() => {
     const getFilteredData = async () => {
@@ -132,10 +128,23 @@ const MountainTrailsMap = () => {
   const handleSuggestionClick = (peak: Peak) => {
     setShowMenu(false);
     setSelectedPeak(peak);
+
     const map = mapRef.current;
     if (map) {
+      map.eachLayer((layer) => {
+        if (layer instanceof L.Marker) {
+          layer.closePopup();
+        }
+      });
       map.setView([peak.lat, peak.lon], 15);
     }
+    setTimeout(() => {
+      const marker = markerRefs.current[peak.id];
+      if (marker) {
+        marker.openPopup();
+      }
+    }, 900);
+
     setSearchTerm(peak.tags.name);
     setFilteredPeaks([]);
   };
@@ -191,7 +200,7 @@ const MountainTrailsMap = () => {
               position={[peak.lat, peak.lon]}
               icon={peakIcon}
               ref={(e) => {
-                 markerRefs.current[peak.id] = e;
+                markerRefs.current[peak.id] = e;
               }}
             >
               <Popup>

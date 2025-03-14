@@ -41,7 +41,8 @@ export const ERROR_MESSAGES = {
   NICKNAME_EXISTS: 'Nickname już istnieje',
   INVALID_PASSWORD: 'Niepoprawne hasło',
   USER_NOT_FOUND: 'Użytkownik nie istnieje',
-  FILE_OVERSIZE: 'Plik jest zbyt duży - max 5MB',
+  UNSUPPROTED_FILE_FORMAT: (allowedFormats: string[]) =>
+    `Obłsugiwane formaty plików: ${allowedFormats.join(', ')}`,
 };
 export const SUCCESS_MESSAGES = {
   PEAK_ADDED: 'Dodano do zdobytych szczytów!',

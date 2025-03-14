@@ -47,7 +47,7 @@ const Header = () => {
   return (
     <>
       <Banner />
-      <Navbar expand="lg" bg="dark" variant="dark" className="navbar">
+      <Navbar expand="sm" bg="dark" variant="dark" sticky="bottom">
         <Container>
           <Navbar.Brand as={Link} to="/">
             <FontAwesomeIcon icon={faPersonHiking} className="nav-logo" />
