@@ -6,3 +6,14 @@
   background-color: rgb(194, 194, 194);
   cursor: pointer;
 }
+
+/* Set map container to fill available space */
+.map-container {
+  display: flex;
+  height: 100vh; /* Make the container take full viewport height */
+}
+
+.map {
+  height: 100%;
+  width: 90%;
+}

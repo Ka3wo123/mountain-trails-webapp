@@ -171,13 +171,8 @@ const MountainTrailsMap = () => {
   }
 
   return (
-    <div style={{ display: 'flex', height: '100vh', justifyContent: 'center' }}>
-      <MapContainer
-        center={[50.0044, 20.591]}
-        zoom={13}
-        style={{ height: '100%', width: '90%' }}
-        ref={mapRef}
-      >
+    <div className="map-container">
+      <MapContainer center={[50.0044, 20.591]} zoom={13} className="map" ref={mapRef}>
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution="&copy; OpenStreetMap contributors"

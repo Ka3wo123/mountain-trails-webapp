@@ -1,17 +1,25 @@
+.statistics {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  padding: 1rem;
+  max-width: 80%;
+  margin: 0 auto;
+  font-family: Arial, sans-serif;
+}
+
 .user-info {
   background-color: #f9f9f9;
   border: 1px solid #e0e0e0;
   margin: 5%;
-}
-
-.stats-text {
-  font-size: clamp(1.5rem, 5vw, 3rem);
+  font-size: clamp(1rem, 1rem, 2rem);
 }
 
 .peaks-list a {
   text-decoration: none;
   color: #0077cc;
   font-weight: bold;
+  font-size: clamp(1rem, 4vw, 2rem);
 }
 
 progress {

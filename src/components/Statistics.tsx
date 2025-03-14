@@ -4,7 +4,7 @@ import { User } from '@/models/User';
 import '@/styles/statistics.css';
 import toast from 'react-hot-toast';
 import LoadingSpinner from '@/components/LoadingSpinner';
-import { ListGroup, ProgressBar } from 'react-bootstrap';
+import { Breadcrumb, ListGroup, ProgressBar } from 'react-bootstrap';
 import axiosInstance from '@/utils/axiosInstance';
 import { API_ENDPOINTS, ERROR_MESSAGES, ROUTES } from '@/constants';
 import CustomPagination from './Pagination';
@@ -40,10 +40,11 @@ const Statistics = () => {
   };
 
   return (
-    <div>
-      <div className="stats-header">
-        <h1 className="stats-text">Statystyki użytkowników</h1>
-      </div>
+    <div className='statistics'>
+      <Breadcrumb>
+        <Breadcrumb.Item href={ROUTES.HOME}>Mapa</Breadcrumb.Item>
+        <Breadcrumb.Item href={ROUTES.USERS_STATS} active>Statystyki</Breadcrumb.Item>        
+      </Breadcrumb>
       <ListGroup className="peaks-list">
         {users.map((user) => (
           <ListGroup.Item key={user.nick} className="user-info">

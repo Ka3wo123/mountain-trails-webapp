@@ -1,8 +1,3 @@
-html,
-body {
-  background-color: rgb(255, 255, 255);
-  overflow-x: hidden;
-}
 
 button {
   font-size: 1.1rem !important;
@@ -35,4 +30,33 @@ button.warning {
 button.success {
   background: linear-gradient(135deg, #4abe65, #0a7521);
   color: white;
+}
+
+.breadcrumb {
+  background-color: transparent;
+  padding: 0;
+  margin-bottom: 1rem;
+}
+
+.breadcrumb-item {
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.breadcrumb-item.active {
+  color: #6c757d;
+}
+/* 
+.breadcrumb-item + .breadcrumb-item::before {
+  content: "›";
+  color: #6c757d; 
+} */
+
+.breadcrumb-item a {
+  color: #007bff;
+}
+
+.breadcrumb-item a:hover {
+  color: #0056b3;
+  text-decoration: underline;
 }

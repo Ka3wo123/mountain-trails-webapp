@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Form } from 'react-bootstrap';
+import { Breadcrumb, Form } from 'react-bootstrap';
 import { toast, Toaster } from 'react-hot-toast';
 import '@/styles/registration.css';
 import axiosInstance from '@/utils/axiosInstance';
-import { API_ENDPOINTS, ERROR_MESSAGES, HTTP_STATUS, SUCCESS_MESSAGES } from '@/constants';
+import { API_ENDPOINTS, ERROR_MESSAGES, HTTP_STATUS, ROUTES, SUCCESS_MESSAGES } from '@/constants';
 
 const Register = () => {
   const [name, setName] = useState<string>('');
@@ -33,7 +33,11 @@ const Register = () => {
   };
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center' }}>
+    <div className='register'>
+      <Breadcrumb>
+        <Breadcrumb.Item href={ROUTES.HOME}>Home</Breadcrumb.Item>
+        <Breadcrumb.Item active>Rejestracja</Breadcrumb.Item>        
+      </Breadcrumb>
       <div className="register-form">
         <h2 className="form-header">Rejestracja do systemu</h2>
         <Form onSubmit={handleSubmit} className="form-controll">

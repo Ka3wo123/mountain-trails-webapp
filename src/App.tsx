@@ -4,6 +4,7 @@ import {
   createRoutesFromElements,
   Route,
   RouterProvider,
+  useLocation,
 } from 'react-router-dom';
 import MountainTrailsMap from '@/components/MountainMap';
 import Header from '@/components/Navbar';

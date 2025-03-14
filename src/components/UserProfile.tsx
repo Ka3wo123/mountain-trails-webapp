@@ -1,6 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { User } from '@/models/User';
 import { PeakDto } from '@/models/PeakDto';
 import '@/styles/user-profile.css';
@@ -21,6 +21,7 @@ import {
   Carousel,
   Dropdown,
   ProgressBar,
+  Breadcrumb,
 } from 'react-bootstrap';
 import toast, { Toaster } from 'react-hot-toast';
 import axiosInstance from '@/utils/axiosInstance';
@@ -29,6 +30,7 @@ import {
   API_ENDPOINTS,
   ERROR_MESSAGES,
   HTTP_STATUS,
+  ROUTES,
   SUCCESS_MESSAGES,
 } from '@/constants';
 import { useAuth } from '@/context/authContext';
@@ -104,7 +106,7 @@ const UserProfile = () => {
 
   const handleScroll = () => {
     const bottom =
-      window.innerHeight + document.documentElement.scrollTop ===
+      window.innerHeight + (document.documentElement.scrollTop || document.body.scrollTop) ===
       document.documentElement.offsetHeight;
     if (bottom && nextCursor && !loading) {
       fetchUserPeaks(nextCursor);
@@ -221,6 +223,11 @@ const UserProfile = () => {
 
   return (
     <div className="user-profile">
+      <Breadcrumb>
+        <Breadcrumb.Item href={ROUTES.HOME}>Home</Breadcrumb.Item>
+        <Breadcrumb.Item href={ROUTES.USERS_STATS}>Statystyki</Breadcrumb.Item>
+        <Breadcrumb.Item active>{nick}</Breadcrumb.Item>
+      </Breadcrumb>
       <h1>
         <em>{user?.nick}</em>
         <br />

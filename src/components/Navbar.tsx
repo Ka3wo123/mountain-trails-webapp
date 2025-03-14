@@ -1,5 +1,5 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Link, Outlet } from 'react-router-dom';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 import { Navbar, Nav, Container, Dropdown, Form } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChartSimple, faMap, faUser, faPersonHiking } from '@fortawesome/free-solid-svg-icons';
@@ -9,13 +9,14 @@ import { toast, Toaster } from 'react-hot-toast';
 import { useAuth } from '@/context/authContext';
 import { getNickname } from '@/utils/jwtDecoder';
 import axiosInstance from '@/utils/axiosInstance';
-import { API_ENDPOINTS, ERROR_MESSAGES, HTTP_STATUS } from '@/constants';
+import { API_ENDPOINTS, ERROR_MESSAGES, HTTP_STATUS, ROUTES } from '@/constants';
 import '@/styles/navbar.css';
 
 const Header = () => {
   const [nick, setNick] = useState<string | undefined>(undefined);
   const [password, setPassword] = useState<string>('');
   const { isAuthenticated, login, logout } = useAuth();
+  const location = useLocation();
 
   useEffect(() => {
     setNick(getNickname());
@@ -47,7 +48,12 @@ const Header = () => {
   return (
     <>
       <Banner />
-      <Navbar expand="sm" bg="dark" variant="dark" sticky="bottom">
+      <Navbar
+        expand="sm"
+        bg="dark"
+        variant="dark"
+        className={location.pathname !== ROUTES.HOME ? 'sticky-top' : ''}
+      >
         <Container>
           <Navbar.Brand as={Link} to="/">
             <FontAwesomeIcon icon={faPersonHiking} className="nav-logo" />
