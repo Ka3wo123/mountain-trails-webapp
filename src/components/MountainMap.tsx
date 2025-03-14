@@ -75,7 +75,6 @@ const MountainTrailsMap = () => {
   const [page, setPage] = useState<number>(1);
   const [totalDocuments, setTotalDocuments] = useState<number>(0);
   const mapRef = useRef<L.Map | null>(null);
-  const [selectedPeak, setSelectedPeak] = useState<Peak | null>(null);
   const markerRefs = useRef<{ [key: string]: L.Marker | null }>({});
   const peakIcon = new Icon({
     iconUrl: peakMarker,
@@ -92,13 +91,6 @@ const MountainTrailsMap = () => {
   useEffect(() => {
     setNick(getNickname());
   }, []);
-
-  // useEffect(() => {
-  //   if (selectedPeak) {
-  //     const marker = markerRefs.current[selectedPeak.id];
-  //     marker?.openPopup();
-  //   }
-  // }, [selectedPeak]);
 
   useEffect(() => {
     const getFilteredData = async () => {
@@ -127,7 +119,6 @@ const MountainTrailsMap = () => {
 
   const handleSuggestionClick = (peak: Peak) => {
     setShowMenu(false);
-    setSelectedPeak(peak);
 
     const map = mapRef.current;
     if (map) {
