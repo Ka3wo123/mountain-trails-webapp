@@ -224,7 +224,7 @@ const UserProfile = () => {
   return (
     <div className="user-profile">
       <Breadcrumb>
-        <Breadcrumb.Item href={ROUTES.HOME}>Home</Breadcrumb.Item>
+        <Breadcrumb.Item href={ROUTES.HOME}>Mapa</Breadcrumb.Item>
         <Breadcrumb.Item href={ROUTES.USERS_STATS}>Statystyki</Breadcrumb.Item>
         <Breadcrumb.Item active>{nick}</Breadcrumb.Item>
       </Breadcrumb>
