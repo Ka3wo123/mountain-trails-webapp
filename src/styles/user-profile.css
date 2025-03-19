@@ -1,4 +1,4 @@
-.user-profile {   
+.user-profile {
   padding: 1rem;
   width: 100%;
   margin: 0 auto;
@@ -123,9 +123,9 @@ h3 {
 
 .peak-gallery-image {
   width: 100%;
-  height: auto;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  max-height: 20rem; 
+  object-fit: cover; 
+  margin: auto;
 }
 
 .pagination {
@@ -197,3 +197,42 @@ h3 {
   display: flex;
   justify-content: space-around;
 }
+
+.carousel-control-prev,
+.carousel-control-next {
+  filter: invert(100%);
+  width: 4%;
+}
+
+.carousel-indicators li {
+  background-color: #3976b8;
+  border-radius: 50%;
+  width: 12px;
+  height: 12px;
+}
+
+
+.modal-dialog {
+  max-width: 80vw; /* Limit modal width to 90% of viewport width */
+  height: 20vh; /* Set height to 90% of viewport height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  width: 100%;
+  height: 50vh; /* Ensure modal content also takes full height */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-body {
+  display: flex;
+  justify-content: center;
+  align-items: center; 
+}
+
+
+

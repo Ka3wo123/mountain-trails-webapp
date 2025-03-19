@@ -6,10 +6,10 @@ import axiosInstance from '@/utils/axiosInstance';
 import { API_ENDPOINTS, ERROR_MESSAGES, HTTP_STATUS, ROUTES, SUCCESS_MESSAGES } from '@/constants';
 
 const Register = () => {
-  const [name, setName] = useState<string>('');
-  const [surname, setSurname] = useState<string>('');
-  const [nick, setNick] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+  const [name, setName] = useState('');
+  const [surname, setSurname] = useState('');
+  const [nick, setNick] = useState('');
+  const [password, setPassword] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,10 +33,10 @@ const Register = () => {
   };
 
   return (
-    <div className='register'>
+    <div className="register">
       <Breadcrumb>
-        <Breadcrumb.Item href={ROUTES.HOME}>Home</Breadcrumb.Item>
-        <Breadcrumb.Item active>Rejestracja</Breadcrumb.Item>        
+        <Breadcrumb.Item href={ROUTES.HOME}>Mapa</Breadcrumb.Item>
+        <Breadcrumb.Item active>Rejestracja</Breadcrumb.Item>
       </Breadcrumb>
       <div className="register-form">
         <h2 className="form-header">Rejestracja do systemu</h2>

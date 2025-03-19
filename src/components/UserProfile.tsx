@@ -34,6 +34,7 @@ import {
   SUCCESS_MESSAGES,
 } from '@/constants';
 import { useAuth } from '@/context/authContext';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 const UserProfile = () => {
   const { nick } = useParams<{ nick: string }>();
@@ -83,7 +84,7 @@ const UserProfile = () => {
         params: { next: cursor, limit: PEAKS_LIMIT },
       });
       setNextCursor(peaksResponse.data.nextCursor);
-      setPeaks((prevPeaks) => [...prevPeaks, ...peaksResponse.data.peakDtos]);
+      setPeaks(() => [...peaks, ...peaksResponse.data.peakDtos]);
       setTotalSystemPeaks(peaksResponse.data.totalSystemPeaks);
     } catch (error) {
       console.error('Error fetching user peaks:', error);
@@ -98,20 +99,6 @@ const UserProfile = () => {
     fetchUserPeaks();
     fetchUserProfile();
   }, [nick]);
-
-  useEffect(() => {
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [nextCursor, loading]);
-
-  const handleScroll = () => {
-    const bottom =
-      window.innerHeight + (document.documentElement.scrollTop || document.body.scrollTop) ===
-      document.documentElement.offsetHeight;
-    if (bottom && nextCursor && !loading) {
-      fetchUserPeaks(nextCursor);
-    }
-  };
 
   const togglePeak = (peakId: string) => {
     if (openPeakId === peakId) {
@@ -189,9 +176,9 @@ const UserProfile = () => {
         return toast.error(ERROR_MESSAGES.SERVER_ERROR);
       }
 
-      setImages((prevImages) => ({
-        ...prevImages,
-        [peakId]: prevImages[peakId].filter((imgData) => !imgData.url.includes(publicId)),
+      setImages(() => ({
+        ...images,
+        [peakId]: images[peakId].filter((imgData) => !imgData.url.includes(publicId)),
       }));
 
       toast.success(SUCCESS_MESSAGES.PHOTO_DELETED);
@@ -249,99 +236,112 @@ const UserProfile = () => {
       {peaks.length > 0 ? (
         <div>
           <ListGroup>
-            {peaks.map((peak: PeakDto) => (
-              <ListGroup.Item key={peak.peakId} className="expandable-item">
-                <div className="item-header" onClick={() => togglePeak(peak.peakId)}>
-                  <FontAwesomeIcon icon={faMountain} />
-                  {peak.name} - {peak.ele} m n.p.m.
-                  <FontAwesomeIcon
-                    icon={openPeakId === peak.peakId ? faChevronUp : faChevronDown}
-                    className="chevron"
-                  />
-                </div>
-                <Collapse in={openPeakId === peak.peakId}>
-                  <div>
-                    <div className="item-details">
-                      {images[peak.peakId] && images[peak.peakId].length > 0 ? (
-                        <div className="peak-images-container">
-                          {images[peak.peakId].slice(0, 3).map((imgData, index) => (
-                            <img
-                              key={index}
-                              src={imgData.url}
-                              alt={`${peak.name} - image ${index + 1}`}
-                              className="peak-image"
-                              onClick={() => openImageModal(peak.peakId)}
-                              style={{
-                                cursor: 'pointer',
+            <InfiniteScroll
+              dataLength={peaks.length}
+              next={() => fetchUserPeaks(nextCursor)}
+              hasMore={!!nextCursor}
+              loader={<LoadingSpinner label="Ładowanie kolejnych szczytów" />}
+              endMessage={
+                <p style={{ textAlign: 'center', marginTop: '1rem' }}>To wszystkie szczyty jakie zostały zdobyte przez {nick} </p>
+              }
+            >
+              {peaks.map((peak: PeakDto) => (
+                <ListGroup.Item key={peak.peakId} className="expandable-item">
+                  <div className="item-header" onClick={() => togglePeak(peak.peakId)}>
+                    <FontAwesomeIcon icon={faMountain} />
+                    {peak.name} - {peak.ele} m n.p.m.
+                    <FontAwesomeIcon
+                      icon={openPeakId === peak.peakId ? faChevronUp : faChevronDown}
+                      className="chevron"
+                    />
+                  </div>
+                  <Collapse in={openPeakId === peak.peakId}>
+                    <div>
+                      <div className="item-details">
+                        {images[peak.peakId] && images[peak.peakId].length > 0 ? (
+                          <div className="peak-images-container">
+                            {images[peak.peakId].slice(0, 3).map((imgData, index) => (
+                              <img
+                                key={index}
+                                src={imgData.url}
+                                alt={`${peak.name} - image ${index + 1}`}
+                                className="peak-image"
+                                onClick={() => openImageModal(peak.peakId)}
+                                style={{
+                                  cursor: 'pointer',
+                                }}
+                              />
+                            ))}
+                          </div>
+                        ) : (
+                          <p>Brak zdjęć</p>
+                        )}
+                        {isAuthenticated ? (
+                          <>
+                            <input
+                              type="file"
+                              onChange={(e) => {
+                                handleFilePick(e);
                               }}
                             />
-                          ))}
-                        </div>
-                      ) : (
-                        <p>Brak zdjęć</p>
-                      )}
-                      {isAuthenticated ? (
-                        <>
-                          <input
-                            type="file"
-                            onChange={(e) => {
-                              handleFilePick(e);
-                            }}
-                          />
-                          {selectedFile && (
-                            <Button className="success" onClick={() => handleUpload(openPeakId!)}>
-                              Prześlij
-                            </Button>
-                          )}
-                        </>
-                      ) : (
-                        <p>Zaloguj się, aby dodać zdjęcia.</p>
-                      )}
-                      <hr />
-                      <a
-                        href={`https://mapa-turystyczna.pl/#${peak.lat}/${peak.lon}/${SCALE}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Zobacz na mapie turystycznej
-                      </a>
-                      <div
-                        style={{
-                          maxWidth: '100%',
-                          overflow: 'hidden',
-                          margin: '0 auto',
-                          minWidth: '300px',
-                        }}
-                      >
-                        <iframe
-                          src="https://mapa-turystyczna.pl/map/widget/route/h1l0p0/3calt.html"
-                          height="680"
-                          style={{ width: '100%', border: 0 }}
-                          loading="lazy"
-                          title="Tourist Map"
-                        ></iframe>
+                            {selectedFile && (
+                              <Button className="success" onClick={() => handleUpload(openPeakId!)}>
+                                Prześlij
+                              </Button>
+                            )}
+                          </>
+                        ) : (
+                          <p>Zaloguj się, aby dodać zdjęcia.</p>
+                        )}
+                        <hr />
                         <a
-                          href="https://mapa-turystyczna.pl/route/3calt?utm_source=external_web&utm_medium=widget&utm_campaign=route_widget"
+                          href={`https://mapa-turystyczna.pl/#${peak.lat}/${peak.lon}/${SCALE}`}
                           target="_blank"
                           rel="noopener noreferrer"
                         >
-                          Trasa: Brzesko – Rozejście szlaków | mapa-turystyczna.pl
+                          Zobacz na mapie turystycznej
                         </a>
-                      </div>
+                        <div
+                          style={{
+                            maxWidth: '100%',
+                            overflow: 'hidden',
+                            margin: '0 auto',
+                            minWidth: '300px',
+                          }}
+                        >
+                          <iframe
+                            src="https://mapa-turystyczna.pl/map/widget/route/h1l0p0/3calt.html"
+                            height="680"
+                            style={{ width: '100%', border: 0 }}
+                            loading="lazy"
+                            title="Tourist Map"
+                          ></iframe>
+                          <a
+                            href="https://mapa-turystyczna.pl/route/3calt?utm_source=external_web&utm_medium=widget&utm_campaign=route_widget"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Trasa: Brzesko – Rozejście szlaków | mapa-turystyczna.pl
+                          </a>
+                        </div>
 
-                      <hr />
-                      <div className="settings">
-                        {isAuthenticated && (
-                          <Button className="danger" onClick={() => handleDeletePeak(peak.peakId)}>
-                            Usuń ze zdobytych
-                          </Button>
-                        )}
+                        <hr />
+                        <div className="settings">
+                          {isAuthenticated && (
+                            <Button
+                              className="danger"
+                              onClick={() => handleDeletePeak(peak.peakId)}
+                            >
+                              Usuń ze zdobytych
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </Collapse>
-              </ListGroup.Item>
-            ))}
+                  </Collapse>
+                </ListGroup.Item>
+              ))}
+            </InfiniteScroll>
           </ListGroup>
         </div>
       ) : (
@@ -378,7 +378,7 @@ const UserProfile = () => {
                               <FontAwesomeIcon
                                 icon={faTrash}
                                 style={{
-                                  marginRight: '6px',
+                                  marginRight: '1rem',
                                 }}
                               />
                               Usuń zdjęcie
@@ -388,7 +388,7 @@ const UserProfile = () => {
                             <FontAwesomeIcon
                               icon={faExpand}
                               style={{
-                                marginRight: '6px',
+                                marginRight: '1rem',
                               }}
                             />
                             Zobacz w pełnym oknie

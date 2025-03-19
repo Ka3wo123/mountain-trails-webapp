@@ -40,10 +40,12 @@ const Statistics = () => {
   };
 
   return (
-    <div className='statistics'>
+    <div className="statistics">
       <Breadcrumb>
         <Breadcrumb.Item href={ROUTES.HOME}>Mapa</Breadcrumb.Item>
-        <Breadcrumb.Item href={ROUTES.USERS_STATS} active>Statystyki</Breadcrumb.Item>        
+        <Breadcrumb.Item href={ROUTES.USERS_STATS} active>
+          Statystyki
+        </Breadcrumb.Item>
       </Breadcrumb>
       <ListGroup className="peaks-list">
         {users.map((user) => (
